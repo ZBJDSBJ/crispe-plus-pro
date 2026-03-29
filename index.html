@@ -1,0 +1,2955 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CRISPE+ Pro · 提示词工程手册</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Noto+Serif+SC:wght@400;600;700;900&family=DM+Mono:wght@400;500&family=Noto+Sans+SC:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f7f5f0;
+  --surface: #ffffff;
+  --surface2: #f0ede6;
+  --border: #e2ddd4;
+  --border2: #cdc8bc;
+  --text: #1c1a16;
+  --muted: #7a7060;
+  --muted2: #5a5244;
+  --gold: #b8860b;
+  --gold2: #d4a020;
+  --gold-bg: #fdf6e3;
+  --teal: #1a7a74;
+  --rose: #b34040;
+  --violet: #7a4f9e;
+  --green: #3a7a3a;
+  --orange: #b86030;
+  --blue: #2a5fa8;
+
+  --c-color: #b8860b;
+  --r-color: #b34040;
+  --i-color: #1a7a74;
+  --s-color: #7a4f9e;
+  --p-color: #3a7a3a;
+  --e-color: #b86030;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 68px; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Noto Sans SC', sans-serif;
+  font-size: 15px;
+  line-height: 1.7;
+  overflow-x: hidden;
+}
+
+/* subtle paper texture */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    radial-gradient(circle at 15% 15%, rgba(184,134,11,0.05) 0%, transparent 55%),
+    radial-gradient(circle at 85% 85%, rgba(26,122,116,0.04) 0%, transparent 55%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── NAV ── */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  background: rgba(247,245,240,0.92);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  padding: 0 32px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.nav-logo {
+  font-family: 'DM Mono', monospace;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--gold);
+  letter-spacing: 2px;
+}
+
+.nav-links { display: flex; gap: 4px; }
+
+.nav-link {
+  font-size: 12px;
+  color: var(--muted);
+  text-decoration: none;
+  padding: 6px 14px;
+  border-radius: 6px;
+  transition: all 0.2s;
+  font-family: 'DM Mono', monospace;
+  letter-spacing: 0.5px;
+}
+.nav-link:hover, .nav-link.active {
+  color: var(--text);
+  background: var(--surface2);
+}
+
+/* ── SECTIONS ── */
+.section {
+  min-height: 100vh;
+  padding: 100px 32px 80px;
+  max-width: 1100px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+}
+
+/* ── HERO ── */
+#hero {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-top: 80px;
+  position: relative;
+}
+
+.hero-eyebrow {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 3px;
+  color: var(--gold);
+  text-transform: uppercase;
+  margin-bottom: 28px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.hero-eyebrow::before {
+  content: '';
+  width: 32px; height: 1px;
+  background: var(--gold);
+}
+
+h1.hero-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(52px, 8vw, 96px);
+  font-weight: 900;
+  line-height: 1.0;
+  letter-spacing: -2px;
+  margin-bottom: 8px;
+  color: var(--text);
+}
+.hero-plus { color: var(--gold); font-style: italic; }
+
+.hero-sub {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(18px, 2.5vw, 28px);
+  font-weight: 700;
+  font-style: italic;
+  color: var(--muted);
+  margin-bottom: 28px;
+  letter-spacing: -0.5px;
+}
+
+.hero-desc {
+  font-size: 16px;
+  color: var(--muted2);
+  max-width: 520px;
+  line-height: 1.8;
+  margin-bottom: 44px;
+}
+
+.hero-cta { display: flex; gap: 12px; flex-wrap: wrap; }
+
+.btn-primary {
+  background: var(--text);
+  color: var(--bg);
+  padding: 13px 28px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.2s;
+  border: none;
+  cursor: pointer;
+  font-family: 'Noto Sans SC', sans-serif;
+}
+.btn-primary:hover {
+  background: var(--gold);
+  color: var(--bg);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(184,134,11,0.25);
+}
+
+.btn-outline {
+  background: transparent;
+  color: var(--text);
+  padding: 13px 28px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.2s;
+  border: 1.5px solid var(--border2);
+  cursor: pointer;
+  font-family: 'Noto Sans SC', sans-serif;
+}
+.btn-outline:hover {
+  border-color: var(--gold);
+  color: var(--gold);
+}
+
+.hero-stats {
+  position: absolute;
+  right: 0; top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+.stat-item { text-align: right; }
+.stat-num {
+  font-family: 'Playfair Display', serif;
+  font-size: 44px;
+  font-weight: 900;
+  color: var(--gold);
+  line-height: 1;
+}
+.stat-label {
+  font-size: 10px;
+  color: var(--muted);
+  font-family: 'DM Mono', monospace;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+@media (max-width: 768px) {
+  .hero-stats { display: none; }
+  nav { padding: 0 16px; }
+  .nav-links { display: none; }
+  .section { padding: 90px 18px 60px; }
+}
+
+/* ── SECTION HEADER ── */
+.section-header { margin-bottom: 44px; }
+
+.section-tag {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 3px;
+  color: var(--gold);
+  text-transform: uppercase;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.section-tag::before {
+  content: '';
+  width: 18px; height: 1px;
+  background: var(--gold);
+}
+
+.section-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(26px, 4vw, 42px);
+  font-weight: 900;
+  letter-spacing: -1px;
+  line-height: 1.1;
+  margin-bottom: 14px;
+  color: var(--text);
+}
+
+.section-desc {
+  font-size: 15px;
+  color: var(--muted2);
+  max-width: 560px;
+  line-height: 1.8;
+}
+
+/* ── FRAMEWORK ── */
+.letter-panels {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 16px;
+}
+@media (max-width: 768px) { .letter-panels { grid-template-columns: 1fr; } }
+
+.lp-card {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 14px;
+  padding: 28px;
+  transition: all 0.25s;
+  cursor: default;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+}
+.lp-card::after {
+  content: attr(data-letter);
+  position: absolute;
+  right: -10px; bottom: -16px;
+  font-family: 'Playfair Display', serif;
+  font-size: 90px; font-weight: 900;
+  opacity: 0.05;
+  color: var(--lp-color);
+  line-height: 1;
+  pointer-events: none;
+}
+.lp-card:hover {
+  border-color: var(--lp-color);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+  transform: translateY(-3px);
+}
+
+.lp-letter {
+  font-family: 'Playfair Display', serif;
+  font-size: 48px; font-weight: 900;
+  color: var(--lp-color);
+  line-height: 1; margin-bottom: 6px;
+}
+.lp-en {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px; letter-spacing: 2px;
+  color: var(--muted); text-transform: uppercase;
+  margin-bottom: 10px;
+}
+.lp-cn {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 17px; font-weight: 700;
+  margin-bottom: 10px; color: var(--text);
+}
+.lp-desc {
+  font-size: 13px; color: var(--muted2);
+  line-height: 1.7; margin-bottom: 16px;
+}
+.lp-example {
+  background: var(--bg);
+  border-left: 2.5px solid var(--lp-color);
+  border-radius: 0 6px 6px 0;
+  padding: 11px 14px;
+  font-size: 12.5px; color: var(--muted2);
+  line-height: 1.7; font-style: italic;
+}
+
+/* ── CASE LIBRARY ── */
+.case-filters {
+  display: flex; gap: 8px;
+  margin-bottom: 28px; flex-wrap: wrap;
+}
+.filter-btn {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px; letter-spacing: 1px;
+  padding: 7px 16px; border-radius: 20px;
+  border: 1.5px solid var(--border2);
+  background: transparent;
+  color: var(--muted); cursor: pointer;
+  transition: all 0.2s;
+}
+.filter-btn:hover, .filter-btn.active {
+  border-color: var(--gold);
+  color: var(--gold);
+  background: var(--gold-bg);
+}
+
+.cases-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+@media (max-width: 768px) { .cases-grid { grid-template-columns: 1fr; } }
+
+.case-card {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+  transition: all 0.25s;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+}
+.case-card:hover {
+  border-color: var(--border2);
+  transform: translateY(-3px);
+  box-shadow: 0 12px 36px rgba(0,0,0,0.1);
+}
+.case-header {
+  padding: 18px 22px 14px;
+  border-bottom: 1px solid var(--border);
+  display: flex; justify-content: space-between;
+  align-items: flex-start;
+}
+.case-meta { display: flex; gap: 7px; flex-wrap: wrap; }
+.case-tag {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px; letter-spacing: 1px;
+  padding: 3px 9px; border-radius: 10px;
+  background: var(--surface2); color: var(--muted2);
+}
+.case-tag.highlight {
+  background: var(--gold-bg);
+  color: var(--gold);
+}
+.case-difficulty { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--muted); }
+.case-title {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 16px; font-weight: 700;
+  padding: 14px 22px 6px; line-height: 1.4;
+  color: var(--text);
+}
+.case-scenario {
+  font-size: 13px; color: var(--muted2);
+  padding: 0 22px 14px; line-height: 1.6;
+}
+
+.case-body { padding: 0 22px 18px; display: none; }
+.case-body.open { display: block; }
+
+.crispe-breakdown {
+  background: var(--bg);
+  border-radius: 10px;
+  padding: 14px; margin-bottom: 12px;
+  border: 1px solid var(--border);
+}
+.cb-row {
+  display: flex; gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px; line-height: 1.6;
+}
+.cb-row:last-child { border-bottom: none; }
+.cb-letter {
+  font-family: 'DM Mono', monospace;
+  font-size: 12px; font-weight: 500;
+  width: 26px; flex-shrink: 0; padding-top: 1px;
+}
+.cb-content { color: var(--muted2); flex: 1; }
+
+.case-prompt-full {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 8px; padding: 14px 16px;
+  font-size: 13px; color: var(--text);
+  line-height: 1.8; white-space: pre-wrap;
+  margin-bottom: 12px; position: relative;
+}
+
+.case-expand-btn {
+  width: 100%;
+  background: transparent;
+  border: 1.5px dashed var(--border2);
+  border-radius: 8px; padding: 10px;
+  color: var(--muted); font-size: 13px;
+  cursor: pointer; transition: all 0.2s;
+  font-family: 'Noto Sans SC', sans-serif;
+}
+.case-expand-btn:hover { border-color: var(--gold); color: var(--gold); }
+
+.copy-small {
+  position: absolute; top: 10px; right: 10px;
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  color: var(--muted); padding: 4px 10px;
+  border-radius: 5px; font-size: 11px;
+  cursor: pointer; font-family: 'DM Mono', monospace;
+  transition: all 0.2s;
+}
+.copy-small:hover { color: var(--gold); border-color: var(--gold); }
+
+/* ── BUILDER ── */
+.builder-wrap {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px; align-items: start;
+}
+@media (max-width: 900px) { .builder-wrap { grid-template-columns: 1fr; } }
+
+.builder-inputs, .builder-output {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 16px; padding: 32px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+  position: sticky;
+  top: 80px;           /* 固定在视口中，低于导航栏 */
+  max-height: calc(100vh - 100px);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+.builder-output { position: sticky; top: 76px; }
+
+.builder-title {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 17px; font-weight: 700;
+  margin-bottom: 5px; color: var(--text);
+}
+.builder-sub {
+  font-size: 11px; color: var(--muted);
+  margin-bottom: 24px;
+  font-family: 'DM Mono', monospace;
+}
+.b-row { margin-bottom: 16px; }
+.b-label {
+  display: flex; align-items: center; gap: 8px;
+  font-family: 'DM Mono', monospace;
+  font-size: 11px; letter-spacing: 1.5px;
+  text-transform: uppercase; margin-bottom: 6px;
+  color: var(--muted);
+}
+.b-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+.b-input {
+  width: 100%;
+  background: var(--bg);
+  border: 1.5px solid var(--border);
+  border-radius: 8px; padding: 11px 14px;
+  font-size: 13.5px; color: var(--text);
+  font-family: 'Noto Sans SC', sans-serif;
+  resize: vertical; outline: none;
+  min-height: 60px; transition: border-color 0.2s;
+  line-height: 1.6;
+}
+.b-input:focus {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(184,134,11,0.1);
+}
+.b-input::placeholder { color: var(--muted); font-size: 13px; }
+
+.b-actions { display: flex; gap: 10px; margin-top: 18px; flex-wrap: wrap; }
+
+.output-title {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px; letter-spacing: 3px;
+  color: var(--gold); text-transform: uppercase;
+  margin-bottom: 18px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+
+.output-score {
+  display: grid; grid-template-columns: repeat(3,1fr);
+  gap: 8px; margin-bottom: 14px;
+}
+.score-item {
+  background: var(--bg); border: 1px solid var(--border);
+  border-radius: 8px; padding: 10px; text-align: center;
+}
+.score-val {
+  font-family: 'Playfair Display', serif;
+  font-size: 22px; font-weight: 700; color: var(--gold);
+}
+.score-lbl {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px; color: var(--muted);
+  letter-spacing: 1px; text-transform: uppercase; margin-top: 2px;
+}
+
+.output-block {
+  background: var(--bg); border-radius: 10px;
+  padding: 18px; min-height: 180px;
+  font-size: 13.5px; line-height: 1.9;
+  color: var(--muted2); white-space: pre-wrap;
+  border: 1px solid var(--border);
+  margin-bottom: 14px;
+  flex: 1;                    /* 撑满父容器剩余空间 */
+  overflow-y: auto;           /* 内容超出时滚动 */
+  max-height: calc(100vh - 320px); /* 视口高度减去标题/按钮/评分区域 */
+  resize: vertical;           /* 用户可手动拖拽调整高度 */
+}
+.output-block::-webkit-scrollbar { width: 5px; }
+.output-block::-webkit-scrollbar-thumb {
+  background: var(--border2); border-radius: 3px;
+}
+.output-block::-webkit-scrollbar-thumb:hover { background: var(--muted); }
+
+.builder-output::-webkit-scrollbar { width: 5px; }
+.builder-output::-webkit-scrollbar-thumb {
+  background: var(--border2); border-radius: 3px;
+}
+
+.output-placeholder {
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  height: 180px; gap: 10px; color: var(--muted);
+}
+.output-placeholder .icon { font-size: 32px; opacity: 0.35; }
+
+/* ── AGENT SKILLS ── */
+.skills-grid {
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  gap: 14px; margin-bottom: 20px;
+}
+@media (max-width: 768px) { .skills-grid { grid-template-columns: 1fr; } }
+
+.skill-card {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 14px; padding: 22px;
+  transition: all 0.25s; cursor: pointer;
+  position: relative; overflow: hidden;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+}
+.skill-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0;
+  height: 2px;
+  background: var(--skill-color);
+  opacity: 0; transition: opacity 0.3s;
+}
+.skill-card:hover::before { opacity: 1; }
+.skill-card:hover {
+  border-color: var(--skill-color);
+  transform: translateY(-3px);
+  box-shadow: 0 10px 32px rgba(0,0,0,0.1);
+}
+
+.skill-icon { font-size: 30px; margin-bottom: 12px; }
+.skill-name {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 15px; font-weight: 700;
+  margin-bottom: 7px; color: var(--text);
+}
+.skill-desc {
+  font-size: 12.5px; color: var(--muted2);
+  line-height: 1.7; margin-bottom: 14px;
+}
+.skill-tags { display: flex; gap: 5px; flex-wrap: wrap; }
+.skill-tag {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px; padding: 3px 8px;
+  border-radius: 10px;
+  background: var(--surface2); color: var(--muted);
+}
+
+.skill-detail {
+  display: none;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 14px; padding: 28px 32px;
+  margin-top: 4px; margin-bottom: 4px;
+  animation: fadeIn 0.25s ease;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.07);
+}
+.skill-detail.open { display: block; }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.skill-detail-title {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 17px; font-weight: 700;
+  margin-bottom: 16px; color: var(--text);
+  display: flex; align-items: center; gap: 10px;
+}
+.skill-prompt-block {
+  background: var(--bg);
+  border-radius: 10px; padding: 18px;
+  font-size: 13px; color: var(--muted2);
+  line-height: 1.9; white-space: pre-wrap;
+  border: 1px solid var(--border);
+  margin-bottom: 16px; position: relative;
+}
+.skill-steps {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 10px; margin-top: 14px;
+}
+@media (max-width: 768px) { .skill-steps { grid-template-columns: 1fr; } }
+.skill-step {
+  background: var(--surface2); border-radius: 10px;
+  padding: 13px 15px; font-size: 13px;
+  border-left: 2.5px solid var(--skill-color, var(--gold));
+}
+.skill-step-num {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px; color: var(--muted); margin-bottom: 4px;
+}
+.skill-step-text { color: var(--muted2); line-height: 1.6; }
+
+/* ── PASSWORD ROW ── */
+.opt-pwd-row {
+  display: flex; align-items: center; gap: 10px;
+  background: var(--surface2); border: 1.5px solid var(--border);
+  border-radius: 10px; padding: 11px 16px;
+  margin-bottom: 14px;
+}
+.opt-pwd-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px; color: var(--muted);
+  letter-spacing: 0.5px; white-space: nowrap;
+}
+.opt-pwd-input {
+  flex: 1; background: transparent; border: none;
+  outline: none; font-size: 13.5px; color: var(--text);
+  font-family: 'Noto Sans SC', sans-serif;
+}
+.opt-pwd-input::placeholder { color: var(--muted); font-size: 13px; }
+.opt-pwd-status {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px; white-space: nowrap;
+  transition: color 0.2s;
+}
+.opt-pwd-status.ok  { color: var(--green); }
+.opt-pwd-status.err { color: var(--rose);  }
+
+/* ── AI OPTIMIZER ── */
+.optimizer-wrap {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 16px; padding: 34px;
+  margin-bottom: 40px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+}
+.optimizer-header {
+  display: flex; align-items: center;
+  gap: 14px; margin-bottom: 22px;
+}
+.ai-badge {
+  background: var(--gold-bg);
+  border: 1px solid rgba(184,134,11,0.3);
+  border-radius: 8px; padding: 5px 13px;
+  font-family: 'DM Mono', monospace;
+  font-size: 10px; letter-spacing: 2px;
+  color: var(--gold); text-transform: uppercase;
+}
+.optimizer-title {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 19px; font-weight: 700; color: var(--text);
+}
+
+.opt-input-area {
+  width: 100%;
+  background: var(--bg);
+  border: 1.5px solid var(--border);
+  border-radius: 10px; padding: 15px;
+  font-size: 14px; color: var(--text);
+  font-family: 'Noto Sans SC', sans-serif;
+  resize: vertical; outline: none;
+  min-height: 110px; transition: border-color 0.2s;
+  line-height: 1.7; margin-bottom: 14px;
+  display: block;
+}
+.opt-input-area:focus { border-color: var(--gold); }
+.opt-input-area::placeholder { color: var(--muted); }
+
+.opt-options { display: flex; gap: 9px; margin-bottom: 14px; flex-wrap: wrap; }
+.opt-option {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px; padding: 7px 13px;
+  border-radius: 6px; border: 1.5px solid var(--border2);
+  background: transparent; color: var(--muted);
+  cursor: pointer; transition: all 0.2s; letter-spacing: 0.5px;
+}
+.opt-option:hover, .opt-option.active {
+  border-color: var(--teal); color: var(--teal);
+  background: rgba(26,122,116,0.07);
+}
+
+.opt-result {
+  background: var(--bg); border: 1px solid var(--border);
+  border-radius: 10px; padding: 18px;
+  display: none; animation: fadeIn 0.3s ease; position: relative;
+}
+.opt-result.visible { display: block; }
+.opt-result-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px; letter-spacing: 2px;
+  color: var(--teal); text-transform: uppercase;
+  margin-bottom: 12px;
+  display: flex; align-items: center; gap: 8px;
+}
+.opt-result-label::before {
+  content: ''; width: 6px; height: 6px;
+  border-radius: 50%; background: var(--teal);
+  animation: pulse 1.5s infinite;
+}
+@keyframes pulse {
+  0%,100% { opacity: 1; } 50% { opacity: 0.3; }
+}
+.opt-result-text {
+  font-size: 14px; color: var(--text);
+  line-height: 1.9; white-space: pre-wrap;
+}
+
+.loading-dots {
+  display: inline-flex; gap: 4px;
+  align-items: center; padding: 18px 0;
+}
+.loading-dots span {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--gold);
+  animation: bounce 0.8s ease infinite;
+}
+.loading-dots span:nth-child(2) { animation-delay: 0.15s; }
+.loading-dots span:nth-child(3) { animation-delay: 0.3s; }
+@keyframes bounce {
+  0%,80%,100% { transform: scale(0.8); opacity: 0.5; }
+  40% { transform: scale(1.2); opacity: 1; }
+}
+
+.opt-actions {
+  display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap;
+}
+
+/* ── CHEATSHEET ── */
+.cheat-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 12px;
+}
+@media (max-width: 768px) { .cheat-grid { grid-template-columns: 1fr; } }
+
+.cheat-card {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 12px; padding: 20px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+}
+.cheat-title {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px; letter-spacing: 2px;
+  color: var(--gold); text-transform: uppercase;
+  margin-bottom: 14px;
+}
+.cheat-items { display: flex; flex-direction: column; gap: 7px; }
+.cheat-item {
+  font-size: 12.5px; color: var(--muted2);
+  line-height: 1.5; padding-left: 13px; position: relative;
+}
+.cheat-item::before {
+  content: '›'; position: absolute; left: 0; color: var(--gold);
+}
+
+/* ── DIVIDER ── */
+.section-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border2), transparent);
+  margin: 0 32px;
+  position: relative; z-index: 1;
+}
+
+/* ── FOOTER ── */
+footer {
+  border-top: 1px solid var(--border);
+  padding: 36px 32px;
+  text-align: center;
+  font-family: 'DM Mono', monospace;
+  font-size: 11px; color: var(--muted);
+  letter-spacing: 1px;
+  position: relative; z-index: 1;
+}
+
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+
+/* ── SKILL → BUILDER INTEGRATION ── */
+
+/* Use-as-template button inside skill detail */
+.skill-use-btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  margin-top: 16px;
+  background: var(--text); color: var(--bg);
+  border: none; border-radius: 8px;
+  padding: 12px 22px; font-size: 13.5px; font-weight: 600;
+  cursor: pointer; transition: all 0.2s;
+  font-family: 'Noto Sans SC', sans-serif;
+}
+.skill-use-btn:hover {
+  background: var(--gold); transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(184,134,11,0.25);
+}
+.skill-use-btn .arrow { font-size: 16px; transition: transform 0.2s; }
+.skill-use-btn:hover .arrow { transform: translateX(4px); }
+
+/* How-to note inside skill detail */
+.skill-howto {
+  background: var(--gold-bg);
+  border: 1px solid rgba(184,134,11,0.2);
+  border-radius: 10px; padding: 14px 18px;
+  margin-bottom: 16px; font-size: 13px;
+  color: var(--muted2); line-height: 1.7;
+}
+.skill-howto strong { color: var(--gold); }
+
+/* Active template banner in builder */
+.builder-template-banner {
+  display: none;
+  align-items: center; justify-content: space-between;
+  background: var(--gold-bg);
+  border: 1px solid rgba(184,134,11,0.25);
+  border-radius: 10px; padding: 12px 16px;
+  margin-bottom: 20px; gap: 10px;
+}
+.builder-template-banner.visible { display: flex; }
+.btb-left { display: flex; align-items: center; gap: 10px; }
+.btb-icon { font-size: 20px; }
+.btb-text { font-size: 13px; color: var(--muted2); line-height: 1.4; }
+.btb-text strong { color: var(--text); display: block; }
+.btb-clear {
+  background: transparent; border: 1px solid var(--border2);
+  border-radius: 6px; padding: 5px 12px;
+  font-size: 11px; color: var(--muted); cursor: pointer;
+  font-family: 'DM Mono', monospace; white-space: nowrap;
+  transition: all 0.2s; flex-shrink: 0;
+}
+.btb-clear:hover { border-color: var(--rose); color: var(--rose); }
+
+/* Highlight on prefilled inputs */
+.b-input.prefilled {
+  border-color: var(--gold);
+  background: var(--gold-bg);
+}
+.b-input.user-edited {
+  border-color: var(--teal);
+  background: rgba(26,122,116,0.04);
+}
+
+/* Edit hint on R and I when prefilled */
+.edit-hint {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px; color: var(--gold);
+  letter-spacing: 0.5px; margin-top: 4px;
+  display: none;
+}
+.edit-hint.visible { display: block; }
+
+/* Step-by-step flow diagram in skill detail */
+.skill-flow {
+  display: flex; align-items: center; gap: 0;
+  margin: 16px 0; flex-wrap: wrap;
+}
+.flow-step {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 8px; padding: 10px 14px;
+  font-size: 12px; color: var(--muted2);
+  text-align: center; flex: 1; min-width: 80px;
+}
+.flow-step .fn { font-family: 'DM Mono', monospace; font-size: 9px; color: var(--muted); margin-bottom: 3px; }
+.flow-step .ft { font-weight: 500; color: var(--text); }
+.flow-arrow {
+  color: var(--border2); font-size: 16px;
+  padding: 0 4px; flex-shrink: 0;
+}
+
+/* Toast notification */
+.toast {
+  position: fixed; bottom: 32px; left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: var(--text); color: var(--bg);
+  padding: 12px 24px; border-radius: 10px;
+  font-size: 13.5px; font-weight: 500;
+  opacity: 0; pointer-events: none;
+  transition: all 0.3s; z-index: 999;
+  white-space: nowrap; box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+}
+.toast.show {
+  opacity: 1; transform: translateX(-50%) translateY(0);
+}
+
+/* Onboarding tooltip */
+.onboard-tip {
+  position: absolute; z-index: 200;
+  background: var(--text); color: var(--bg);
+  border-radius: 10px; padding: 12px 16px;
+  font-size: 13px; max-width: 220px; line-height: 1.5;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+  pointer-events: none; opacity: 0;
+  transition: opacity 0.3s;
+}
+.onboard-tip::before {
+  content: ''; position: absolute;
+  border: 6px solid transparent;
+}
+.onboard-tip.top::before {
+  border-top-color: var(--text);
+  bottom: -12px; left: 50%; transform: translateX(-50%);
+}
+
+/* ── SKILL DOC TABS ── */
+.skill-tabs {
+  display: flex; gap: 3px;
+  margin: 22px 0 0;
+  border-bottom: 1.5px solid var(--border);
+  flex-wrap: wrap;
+}
+.skill-tab {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px; letter-spacing: 1px;
+  text-transform: uppercase; font-weight: 500;
+  padding: 7px 13px 8px;
+  border: 1.5px solid transparent;
+  border-bottom: none;
+  border-radius: 7px 7px 0 0;
+  background: transparent; color: var(--muted);
+  cursor: pointer; transition: all 0.18s;
+  position: relative; bottom: -1.5px;
+}
+.skill-tab:hover { color: var(--skill-color); background: var(--surface2); }
+.skill-tab.active {
+  background: var(--surface);
+  border-color: var(--border);
+  color: var(--skill-color);
+  font-weight: 700;
+}
+.skill-tabpanel { display: none; padding-top: 14px; }
+.skill-tabpanel.active { display: block; }
+.skill-doc-header {
+  display: flex; align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px; flex-wrap: wrap; gap: 8px;
+}
+.skill-doc-filename {
+  font-family: 'DM Mono', monospace; font-size: 11px;
+  color: var(--skill-color);
+  background: rgba(0,0,0,0.04);
+  border: 1px solid var(--border2);
+  padding: 3px 10px; border-radius: 5px;
+}
+.skill-doc-desc {
+  font-size: 12.5px; color: var(--muted2);
+  line-height: 1.65; margin-bottom: 12px;
+  font-family: 'Noto Sans SC', sans-serif;
+}
+.skill-doc-block {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--skill-color);
+  border-radius: 0 8px 8px 8px;
+  padding: 15px 17px;
+  font-family: 'DM Mono', monospace;
+  font-size: 11.5px; color: var(--muted2);
+  line-height: 1.9; white-space: pre-wrap;
+  max-height: 280px; overflow-y: auto;
+}
+.skill-doc-block::-webkit-scrollbar { width: 4px; }
+.skill-doc-block::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+
+/* ── DOC FILES SECTION ───────────────────────────── */
+.docfiles-intro {
+  display: grid; grid-template-columns: repeat(5,1fr); gap: 10px;
+  margin-bottom: 32px;
+}
+@media(max-width:900px){ .docfiles-intro{ grid-template-columns: repeat(3,1fr); } }
+@media(max-width:600px){ .docfiles-intro{ grid-template-columns: 1fr 1fr; } }
+
+.dfi-card {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-top: 3px solid var(--dfi-color);
+  border-radius: 10px; padding: 14px 16px;
+  cursor: pointer; transition: all .2s;
+  text-align: center;
+}
+.dfi-card:hover, .dfi-card.active {
+  border-color: var(--dfi-color);
+  box-shadow: 0 4px 16px rgba(0,0,0,.08);
+  transform: translateY(-2px);
+}
+.dfi-card.active { background: color-mix(in srgb, var(--dfi-color) 5%, white); }
+.dfi-icon  { font-size: 22px; margin-bottom: 6px; }
+.dfi-name  { font-family:'Noto Serif SC',serif; font-size:14px; font-weight:700; color:var(--text); }
+.dfi-file  { font-family:'DM Mono',monospace; font-size:9px; color:var(--dfi-color);
+             letter-spacing:.5px; margin-top:3px; }
+.dfi-short { font-size:11px; color:var(--muted); margin-top:5px; line-height:1.4; }
+
+.docfile-panel { display:none; }
+.docfile-panel.active { display:block; }
+
+.dfp-layout {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
+}
+@media(max-width:768px){ .dfp-layout{ grid-template-columns:1fr; } }
+
+.dfp-left {}
+.dfp-badge {
+  display:inline-flex; align-items:center; gap:8px;
+  background: color-mix(in srgb, var(--dfi-color) 10%, white);
+  border: 1px solid color-mix(in srgb, var(--dfi-color) 30%, transparent);
+  border-radius:8px; padding:6px 14px; margin-bottom:14px;
+}
+.dfp-badge-icon { font-size:16px; }
+.dfp-badge-name { font-family:'Noto Serif SC',serif; font-size:15px; font-weight:700; color:var(--text); }
+.dfp-badge-file { font-family:'DM Mono',monospace; font-size:10px; color:var(--dfi-color); margin-left:6px; }
+
+.dfp-def {
+  font-size:13.5px; color:var(--muted2); line-height:1.8;
+  margin-bottom:16px;
+}
+.dfp-when-title {
+  font-family:'DM Mono',monospace; font-size:10px; letter-spacing:2px;
+  text-transform:uppercase; color:var(--muted); margin-bottom:8px;
+}
+.dfp-when-list { list-style:none; padding:0; }
+.dfp-when-list li {
+  font-size:12.5px; color:var(--muted2); padding:5px 0 5px 18px;
+  position:relative; border-bottom:1px solid var(--border); line-height:1.6;
+}
+.dfp-when-list li:last-child { border-bottom:none; }
+.dfp-when-list li::before {
+  content:'→'; position:absolute; left:0;
+  color:var(--dfi-color); font-family:'DM Mono',monospace; font-size:11px;
+}
+
+.dfp-right {}
+.dfp-tpl-header {
+  display:flex; align-items:center; justify-content:space-between;
+  margin-bottom:8px;
+}
+.dfp-tpl-label {
+  font-family:'DM Mono',monospace; font-size:10px; letter-spacing:2px;
+  text-transform:uppercase; color:var(--muted);
+}
+.dfp-tpl-block {
+  background:var(--bg);
+  border:1px solid var(--border);
+  border-left:3px solid var(--dfi-color);
+  border-radius:0 8px 8px 8px;
+  padding:16px 18px;
+  font-family:'DM Mono',monospace;
+  font-size:11.5px; color:var(--muted2);
+  line-height:1.9; white-space:pre-wrap;
+  max-height:340px; overflow-y:auto;
+}
+.dfp-tpl-block::-webkit-scrollbar { width:4px; }
+.dfp-tpl-block::-webkit-scrollbar-thumb { background:var(--border2); border-radius:2px; }
+
+.dfp-combo {
+  margin-top:28px;
+  background:var(--surface);
+  border:1.5px solid var(--border);
+  border-radius:14px; padding:24px 28px;
+}
+.dfp-combo-title {
+  font-family:'Noto Serif SC',serif; font-size:15px; font-weight:700;
+  margin-bottom:6px;
+}
+.dfp-combo-desc { font-size:13px; color:var(--muted2); margin-bottom:18px; line-height:1.7; }
+.dfp-stack {
+  display:flex; gap:0;
+  border:1px solid var(--border); border-radius:10px; overflow:hidden;
+  margin-bottom:16px;
+}
+.dfp-stack-item {
+  flex:1; padding:14px 16px;
+  border-right:1px solid var(--border);
+}
+.dfp-stack-item:last-child { border-right:none; }
+.dfp-stack-num {
+  font-family:'DM Mono',monospace; font-size:9px; letter-spacing:2px;
+  text-transform:uppercase; font-weight:700; margin-bottom:5px;
+}
+.dfp-stack-text { font-size:12px; color:var(--muted2); line-height:1.6; }
+@media(max-width:600px){
+  .dfp-stack{ flex-direction:column; }
+  .dfp-stack-item{ border-right:none; border-bottom:1px solid var(--border); }
+  .dfp-stack-item:last-child{ border-bottom:none; }
+}
+.dfp-example {
+  font-size:12.5px; color:var(--muted2); line-height:1.8;
+  padding:14px 16px; background:var(--surface2);
+  border-radius:8px; border-left:3px solid var(--gold);
+}
+.dfp-example strong { color:var(--text); }
+
+
+/* ── PROMPT HISTORY ─────────────────────────────── */
+.history-panel {
+  margin-top: 28px;
+  border: 1.5px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+  background: var(--surface);
+}
+.history-header {
+  display: flex; align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface2);
+  cursor: pointer; user-select: none;
+}
+.history-header:hover { background: var(--bg); }
+.history-title {
+  display: flex; align-items: center; gap: 8px;
+  font-family: 'DM Mono', monospace;
+  font-size: 11px; letter-spacing: 1.5px;
+  text-transform: uppercase; font-weight: 600; color: var(--text);
+}
+.history-count {
+  background: var(--gold); color: #fff;
+  font-size: 10px; font-weight: 700;
+  padding: 2px 7px; border-radius: 20px;
+  min-width: 20px; text-align: center;
+}
+.history-toggle-icon { font-size: 12px; color: var(--muted); transition: transform 0.2s; }
+.history-panel.open .history-toggle-icon { transform: rotate(180deg); }
+.history-body { display: none; max-height: 500px; overflow-y: auto; }
+.history-panel.open .history-body { display: block; }
+.history-body::-webkit-scrollbar { width: 4px; }
+.history-body::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+.history-empty { padding: 32px 20px; text-align: center; color: var(--muted); font-size: 13px; }
+.history-item {
+  border-bottom: 1px solid var(--border);
+  padding: 14px 20px; transition: background 0.15s;
+}
+.history-item:last-child { border-bottom: none; }
+.history-item:hover { background: var(--bg); }
+.history-item-top {
+  display: flex; align-items: flex-start;
+  justify-content: space-between; gap: 12px; margin-bottom: 8px;
+}
+.history-item-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.history-item-num {
+  font-family: 'DM Mono', monospace; font-size: 10px;
+  font-weight: 700; color: var(--gold); letter-spacing: 1px;
+}
+.history-item-time { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--muted); }
+.history-item-dims {
+  font-size: 10px; color: var(--muted2);
+  background: var(--surface2); border: 1px solid var(--border);
+  padding: 1px 6px; border-radius: 4px;
+}
+.history-item-actions { display: flex; gap: 6px; flex-shrink: 0; }
+.history-action-btn {
+  font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.5px;
+  padding: 4px 10px; border: 1px solid var(--border2); border-radius: 6px;
+  background: var(--surface); color: var(--muted2); cursor: pointer; transition: all 0.15s;
+}
+.history-action-btn:hover { border-color: var(--gold); color: var(--gold); }
+.history-action-btn.del:hover { border-color: #e05252; color: #e05252; }
+.history-item-preview {
+  font-size: 12.5px; color: var(--muted2); line-height: 1.6;
+  display: -webkit-box; -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical; overflow: hidden; cursor: pointer;
+}
+.history-item-preview.expanded {
+  display: block; -webkit-line-clamp: unset;
+  white-space: pre-wrap;
+  background: var(--bg); border: 1px solid var(--border);
+  border-radius: 8px; padding: 10px 12px;
+  font-family: 'DM Mono', monospace; font-size: 11.5px;
+  max-height: 240px; overflow-y: auto;
+}
+.history-footer {
+  padding: 12px 20px; border-top: 1px solid var(--border);
+  display: flex; justify-content: space-between; align-items: center;
+}
+.history-footer-note { font-size: 11px; color: var(--muted); font-family: 'DM Mono',monospace; }
+.history-clear-btn {
+  font-size: 12px; color: var(--muted); background: none; border: none;
+  cursor: pointer; padding: 4px 8px; border-radius: 6px; transition: all 0.15s;
+}
+.history-clear-btn:hover { color: #e05252; }
+
+
+@media (max-width: 768px) {
+  .builder-output {
+    position: static;
+    max-height: none;
+    overflow-y: visible;
+  }
+  .output-block {
+    max-height: 50vh;
+  }
+}
+
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">CRISPE<span style="color:var(--muted)">+</span> PRO</div>
+  <div class="nav-links">
+    <a href="#framework" class="nav-link" onclick="navTo('framework',event)">框架</a>
+    <a href="#builder"   class="nav-link" onclick="navTo('builder',event)">生成器</a>
+    <a href="#cases"     class="nav-link" onclick="navTo('cases',event)">案例库</a>
+    <a href="#optimizer" class="nav-link" onclick="navTo('optimizer',event)">AI优化</a>
+    <a href="#skills"    class="nav-link" onclick="navTo('skills',event)">Agent技能</a>
+    <a href="#docfiles"  class="nav-link" onclick="navTo('docfiles',event)">规范文件</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="section" id="hero">
+  <div class="hero-eyebrow">Prompt Engineering Framework</div>
+  <h1 class="hero-title">CRISPE<span class="hero-plus">+</span></h1>
+  <div class="hero-sub">提示词万能框架 · 专业版</div>
+  <p class="hero-desc">结构化你与 AI 的每一次对话。从框架学习到案例实践，从提示词生成到 Agent 技能——每个 Agent 内置完整的 Cursor / CLAUDE.md 项目规范文件（Rules · Skills · Plans · Specs）。</p>
+  <div class="hero-cta">
+    <a href="#framework" class="btn-primary">开始学习</a>
+    <a href="#cases" class="btn-outline">查看案例库</a>
+  </div>
+  <div class="hero-stats">
+    <div class="stat-item"><div class="stat-num">6</div><div class="stat-label">Framework Dims</div></div>
+    <div class="stat-item"><div class="stat-num">11</div><div class="stat-label">Case Studies</div></div>
+    <div class="stat-item"><div class="stat-num">10</div><div class="stat-label">Agent Skills</div></div>
+  </div>
+</div>
+
+<div class="section-divider"></div>
+
+<!-- FRAMEWORK -->
+<div class="section" id="framework">
+  <div class="section-header">
+    <div class="section-tag">01 · Framework</div>
+    <h2 class="section-title">六维框架解析</h2>
+    <p class="section-desc">CRISPE+ 通过六个维度构建完整的 AI 指令体系，每张卡片包含详细说明与真实例句。</p>
+  </div>
+  <div class="letter-panels">
+    <div class="lp-card" style="--lp-color:var(--c-color)" data-letter="C">
+      <div class="lp-letter" style="color:var(--c-color)">C</div>
+      <div class="lp-en">Capacity & Role</div>
+      <div class="lp-cn">能力与角色</div>
+      <div class="lp-desc">赋予 AI 一个具体的专家身份。角色越精确，AI 的思维框架越专业。可以叠加多重角色与背景。</div>
+      <div class="lp-example">"你是一位有 10 年经验的 UX 设计师，同时具备用户心理学背景，曾主导多个 SaaS 产品的体验改版。"</div>
+    </div>
+    <div class="lp-card" style="--lp-color:var(--r-color)" data-letter="R">
+      <div class="lp-letter" style="color:var(--r-color)">R</div>
+      <div class="lp-en">Insight & Context</div>
+      <div class="lp-cn">背景与见解</div>
+      <div class="lp-desc">提供任务的背景信息：你是谁、项目状态、受众特征、已知限制。背景越充分，回答越贴合。</div>
+      <div class="lp-example">"我负责一款面向企业客户的 B2B SaaS 产品，目前用户留存率偏低，主要用户是 IT 部门负责人。"</div>
+    </div>
+    <div class="lp-card" style="--lp-color:var(--i-color)" data-letter="I">
+      <div class="lp-letter" style="color:var(--i-color)">I</div>
+      <div class="lp-en">Statement & Task</div>
+      <div class="lp-cn">任务陈述</div>
+      <div class="lp-desc">核心指令。明确告诉 AI 要做什么。用动词开头，可以拆分成步骤，越具体越好。</div>
+      <div class="lp-example">"请为我的产品设计一套 3 步骤的新用户引导流程，重点解决用户注册后第一周的流失问题。"</div>
+    </div>
+    <div class="lp-card" style="--lp-color:var(--s-color)" data-letter="S">
+      <div class="lp-letter" style="color:var(--s-color)">S</div>
+      <div class="lp-en">Personality & Style</div>
+      <div class="lp-cn">个性与风格</div>
+      <div class="lp-desc">指定回答的语气、风格、措辞习惯。可以参考具体人物、品牌，或描述目标读者的阅读感受。</div>
+      <div class="lp-example">"语气专业但不失亲切，像顾问而非教授。避免行话，多用类比，让非技术背景的高管也能理解。"</div>
+    </div>
+    <div class="lp-card" style="--lp-color:var(--p-color)" data-letter="P">
+      <div class="lp-letter" style="color:var(--p-color)">P</div>
+      <div class="lp-en">Experiment</div>
+      <div class="lp-cn">实验与示例</div>
+      <div class="lp-desc">要求 AI 提供多个版本、角度或对比选项。让你在不同方案中快速筛选最优解。</div>
+      <div class="lp-example">"请给出 3 个版本：一个保守方案、一个激进创新方案、一个折中方案，标注核心差异。"</div>
+    </div>
+    <div class="lp-card" style="--lp-color:var(--e-color)" data-letter="E+">
+      <div class="lp-letter" style="color:var(--e-color);font-size:38px">E<span style="font-size:22px">+</span></div>
+      <div class="lp-en">Format (Enhanced)</div>
+      <div class="lp-cn">输出格式（增强）</div>
+      <div class="lp-desc">指定输出形式：Markdown、表格、JSON、代码、流程图描述、编号列表……格式明确让输出直接可用。</div>
+      <div class="lp-example">"用 Markdown 输出，每个方案用 ## 标题，包含「核心思路」「实施步骤」「预期风险」三个子章节。"</div>
+    </div>
+  </div>
+</div>
+
+<div class="section-divider"></div>
+
+<!-- BUILDER -->
+<div class="section" id="builder">
+  <div class="section-header">
+    <div class="section-tag">02 · Prompt Builder</div>
+    <h2 class="section-title">提示词生成器</h2>
+    <p class="section-desc">从 Agent 技能模板一键导入框架，只需修改背景与任务，即可生成专属提示词。</p>
+  </div>
+  <div class="builder-wrap">
+    <div class="builder-inputs">
+
+      <!-- Template banner (hidden until a skill is loaded) -->
+      <div class="builder-template-banner" id="templateBanner">
+        <div class="btb-left">
+          <div class="btb-icon" id="bannerIcon">✍️</div>
+          <div class="btb-text">
+            <strong id="bannerName">内容创作 Agent</strong>
+            已导入模板 · 修改 <span style="color:var(--r-color);font-weight:600">R 背景</span> 和 <span style="color:var(--i-color);font-weight:600">I 任务</span> 来定制你的场景
+          </div>
+        </div>
+        <button class="btb-clear" onclick="clearBuilder()">✕ 清除模板</button>
+      </div>
+
+      <div class="builder-title" id="builderTitle">填写维度</div>
+      <div class="builder-sub">// 至少填写 C · R · I 三项，或从 Agent 技能模板导入</div>
+
+      <div class="b-row">
+        <div class="b-label"><div class="b-dot" style="background:var(--c-color)"></div><span style="color:var(--c-color)">C</span> — 角色设定</div>
+        <textarea class="b-input" id="b-c" placeholder="你是一位…（职业 + 专长 + 背景）" oninput="onUserEdit('b-c')" rows="2"></textarea>
+      </div>
+      <div class="b-row">
+        <div class="b-label"><div class="b-dot" style="background:var(--r-color)"></div><span style="color:var(--r-color)">R</span> — 背景说明 <span style="color:var(--rose);margin-left:4px;font-size:10px" id="r-required"></span></div>
+        <textarea class="b-input" id="b-r" placeholder="我正在…（项目背景、目标用户、限制）" oninput="onUserEdit('b-r')" rows="2"></textarea>
+        <div class="edit-hint" id="hint-r">✏️ 请把这里替换成你自己的背景信息</div>
+      </div>
+      <div class="b-row">
+        <div class="b-label"><div class="b-dot" style="background:var(--i-color)"></div><span style="color:var(--i-color)">I</span> — 核心任务 <span style="color:var(--rose);margin-left:4px;font-size:10px" id="i-required"></span></div>
+        <textarea class="b-input" id="b-i" placeholder="请帮我…（具体任务，用动词开头）" oninput="onUserEdit('b-i')" rows="2"></textarea>
+        <div class="edit-hint" id="hint-i">✏️ 请把这里替换成你具体想做的事</div>
+      </div>
+      <div class="b-row">
+        <div class="b-label"><div class="b-dot" style="background:var(--s-color)"></div><span style="color:var(--s-color)">S</span> — 风格要求</div>
+        <textarea class="b-input" id="b-s" placeholder="语气风格…（专业/轻松/简洁/详细）" oninput="onUserEdit('b-s')" rows="2"></textarea>
+      </div>
+      <div class="b-row">
+        <div class="b-label"><div class="b-dot" style="background:var(--p-color)"></div><span style="color:var(--p-color)">P</span> — 示例要求</div>
+        <textarea class="b-input" id="b-p" placeholder="请提供…个版本 / 示例…" oninput="onUserEdit('b-p')" rows="2"></textarea>
+      </div>
+      <div class="b-row">
+        <div class="b-label"><div class="b-dot" style="background:var(--e-color)"></div><span style="color:var(--e-color)">E+</span> — 输出格式</div>
+        <textarea class="b-input" id="b-e" placeholder="输出格式：Markdown / 表格 / JSON…" oninput="onUserEdit('b-e')" rows="2"></textarea>
+      </div>
+      <div class="b-actions">
+        <button class="btn-primary" onclick="buildPrompt()">⚡ 生成提示词</button>
+        <button class="btn-outline" onclick="clearBuilder()">清空重置</button>
+      </div>
+    </div>
+    <div class="builder-output">
+      <div class="output-title">
+        <span>Generated Prompt</span>
+        <button class="copy-small" id="copyMainBtn" onclick="copyMain()" style="position:static">复制</button>
+      </div>
+      <div class="output-score" id="outputScore" style="display:none">
+        <div class="score-item"><div class="score-val" id="score-complete">0%</div><div class="score-lbl">完整度</div></div>
+        <div class="score-item"><div class="score-val" id="score-dims">0/6</div><div class="score-lbl">维度数</div></div>
+        <div class="score-item"><div class="score-val" id="score-words">0</div><div class="score-lbl">字数</div></div>
+      </div>
+      <div class="output-block" id="mainOutput">
+        <div class="output-placeholder">
+          <div class="icon">✦</div>
+          <div style="font-size:13px;text-align:center;line-height:1.7;color:var(--muted)">填写左侧维度<br>提示词将在这里实时生成</div>
+        </div>
+      </div>
+      <button class="btn-outline" style="width:100%;font-size:13px" onclick="copyMain()">📋 复制完整提示词</button>
+    </div>
+  </div>
+
+  <!-- PROMPT HISTORY PANEL -->
+  <div class="history-panel" id="historyPanel">
+    <div class="history-header" onclick="toggleHistory()">
+      <div class="history-title">
+        <span>📋</span><span>历史提示词</span>
+        <span class="history-count" id="historyCount">0</span>
+      </div>
+      <span class="history-toggle-icon">▼</span>
+    </div>
+    <div class="history-body" id="historyBody">
+      <div class="history-empty" id="historyEmpty">暂无记录 · 生成提示词后自动保存，最多保留 50 条</div>
+      <div id="historyList"></div>
+      <div class="history-footer">
+        <span class="history-footer-note" id="historyNote"></span>
+        <button class="history-clear-btn" onclick="clearHistory()">🗑 清空全部</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="section-divider"></div>
+
+<!-- CASE LIBRARY -->
+<div class="section" id="cases">
+  <div class="section-header">
+    <div class="section-tag">03 · Case Library</div>
+    <h2 class="section-title">案例库</h2>
+    <p class="section-desc">11 个真实场景的 CRISPE+ 完整提示词，按行业分类，点击展开查看完整拆解与提示词。</p>
+  </div>
+  <div class="case-filters">
+    <button class="filter-btn active" onclick="filterCases('all',this)">全部</button>
+    <button class="filter-btn" onclick="filterCases('marketing',this)">营销文案</button>
+    <button class="filter-btn" onclick="filterCases('product',this)">产品设计</button>
+    <button class="filter-btn" onclick="filterCases('tech',this)">技术开发</button>
+    <button class="filter-btn" onclick="filterCases('business',this)">商业分析</button>
+    <button class="filter-btn" onclick="filterCases('education',this)">教育培训</button>
+    <button class="filter-btn" onclick="filterCases('hr',this)">人力资源</button>
+  </div>
+  <div class="cases-grid" id="casesGrid"></div>
+</div>
+
+<div class="section-divider"></div>
+
+<!-- AI OPTIMIZER + CHEATSHEET -->
+<div class="section" id="optimizer">
+  <div class="section-header">
+    <div class="section-tag">04 · Smart Optimizer</div>
+    <h2 class="section-title">提示词结构优化器</h2>
+    <p class="section-desc">真实 Claude Haiku 驱动，密码验证后可用。每天全站共 <strong>20 次</strong> AI 优化，超出后自动切换本地规则引擎继续工作。</p>
+  </div>
+  <div class="optimizer-wrap">
+
+    <!-- 状态栏 -->
+    <div class="optimizer-header">
+      <div class="ai-badge" id="optBadge">✦ Claude 驱动</div>
+      <div class="optimizer-title">提示词结构优化器</div>
+      <div id="optQuotaDisplay" style="font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);margin-left:auto;display:none">
+        今日已用 <span id="optQuotaUsed" style="color:var(--gold);font-weight:600">0</span>/<span id="optQuotaLimit">20</span>
+      </div>
+    </div>
+
+    <!-- 密码输入行 -->
+    <div class="opt-pwd-row" id="optPwdRow">
+      <span class="opt-pwd-label">🔑 访问密码</span>
+      <input type="password" id="optPwd" class="opt-pwd-input"
+             placeholder="输入密码后使用 Claude 优化"
+             oninput="onPwdInput()"
+             onkeydown="if(event.key==='Enter')runOptimizer()">
+      <span id="optPwdStatus" class="opt-pwd-status"></span>
+    </div>
+
+    <textarea class="opt-input-area" id="optInput"
+      placeholder="粘贴你的提示词，例如：&#10;「帮我写一篇关于 AI 的文章」&#10;「分析一下这份数据」&#10;「帮我回复这封邮件」"></textarea>
+
+    <div class="opt-options">
+      <button class="opt-option active" data-mode="crispe"   onclick="setOptMode(this)">🔄 转换为CRISPE+</button>
+      <button class="opt-option"        data-mode="enhance"  onclick="setOptMode(this)">🔍 补全缺失维度</button>
+      <button class="opt-option"        data-mode="variants" onclick="setOptMode(this)">✦ 生成3个变体</button>
+      <button class="opt-option"        data-mode="critique" onclick="setOptMode(this)">⚠ 弱点诊断</button>
+    </div>
+
+    <button class="btn-primary" onclick="runOptimizer()" style="margin-bottom:18px">⚡ 立即优化</button>
+
+    <div class="opt-result" id="optResult">
+      <div class="opt-result-label" id="optResultLabel">优化结果</div>
+      <div class="opt-result-text"  id="optResultText"></div>
+    </div>
+  </div>
+
+  <div class="section-header" style="margin-top:48px">
+    <div class="section-tag">07 · Cheatsheet</div>
+    <h2 class="section-title">速查手册</h2>
+  </div>
+  <div class="cheat-grid">
+    <div class="cheat-card">
+      <div class="cheat-title">💡 角色设定技巧</div>
+      <div class="cheat-items">
+        <div class="cheat-item">叠加职业 + 专长 + 经验年限</div>
+        <div class="cheat-item">加入行业背景：「服务过500强」</div>
+        <div class="cheat-item">指定知识边界：「专注B端产品」</div>
+        <div class="cheat-item">用「同时具备」叠加跨学科角色</div>
+        <div class="cheat-item">避免过宽：「AI专家」< 「CV算法工程师」</div>
+      </div>
+    </div>
+    <div class="cheat-card">
+      <div class="cheat-title">📝 任务描述技巧</div>
+      <div class="cheat-items">
+        <div class="cheat-item">用动词开头：写/分析/设计/评估</div>
+        <div class="cheat-item">加数量约束：3条/500字/5个方案</div>
+        <div class="cheat-item">指定交付物：「表格/流程图/代码」</div>
+        <div class="cheat-item">分步骤拆解复杂任务</div>
+        <div class="cheat-item">加「不要」约束排除不需要的内容</div>
+      </div>
+    </div>
+    <div class="cheat-card">
+      <div class="cheat-title">🎯 提升效果技巧</div>
+      <div class="cheat-items">
+        <div class="cheat-item">加「先思考，再输出」提升推理</div>
+        <div class="cheat-item">用「假设你的用户是…」锁定受众</div>
+        <div class="cheat-item">「列出你的假设」让逻辑透明</div>
+        <div class="cheat-item">「给出置信度」量化AI的确定性</div>
+        <div class="cheat-item">「逐步验证」让AI自我检查输出</div>
+      </div>
+    </div>
+    <div class="cheat-card">
+      <div class="cheat-title">⚡ 常用格式模板</div>
+      <div class="cheat-items">
+        <div class="cheat-item">用Markdown，## 分节，**加粗**重点</div>
+        <div class="cheat-item">表格对比：| 方案 | 优点 | 缺点 |</div>
+        <div class="cheat-item">JSON结构化数据输出</div>
+        <div class="cheat-item">「先给结论，再展开」倒金字塔</div>
+        <div class="cheat-item">「每条不超过X字」控制输出长度</div>
+      </div>
+    </div>
+    <div class="cheat-card">
+      <div class="cheat-title">🚫 常见错误</div>
+      <div class="cheat-items">
+        <div class="cheat-item">只说「帮我写篇文章」太模糊</div>
+        <div class="cheat-item">角色太宽泛：「你是一个助手」</div>
+        <div class="cheat-item">忘记说明目标受众是谁</div>
+        <div class="cheat-item">没有限制输出长度和格式</div>
+        <div class="cheat-item">任务和背景混在一起写</div>
+      </div>
+    </div>
+    <div class="cheat-card">
+      <div class="cheat-title">🔄 迭代优化流程</div>
+      <div class="cheat-items">
+        <div class="cheat-item">第1轮：先用最简版测试方向</div>
+        <div class="cheat-item">第2轮：补充缺失的背景信息</div>
+        <div class="cheat-item">第3轮：调整风格和输出格式</div>
+        <div class="cheat-item">第4轮：加入约束条件和反例</div>
+        <div class="cheat-item">收藏最终版本建立个人提示词库</div>
+      </div>
+    </div>
+  </div>
+</div><div class="section-divider"></div>
+
+<!-- AGENT SKILLS -->
+<div class="section" id="skills">
+  <div class="section-header">
+    <div class="section-tag">05 · Agent Skills</div>
+    <h2 class="section-title">Agent 技能模板</h2>
+    <p class="section-desc">选择一个技能，点击「<strong>用这个模板定制我的提示词</strong>」，系统会自动填入角色框架，你只需补充自己的背景和任务即可。</p>
+  </div>
+  <div class="skills-grid" id="skillsGrid"></div>
+  <div id="skillDetail"></div>
+</div>
+
+<div class="section-divider"></div>
+
+<!-- PROJECT DOC FILES -->
+<div class="section" id="docfiles">
+  <div class="section-header">
+    <div class="section-tag">06 · Project Doc Files</div>
+    <h2 class="section-title">五种项目规范文件</h2>
+    <p class="section-desc">Cursor、Windsurf、Claude Code 等 AI 编辑器通过项目规范文件理解你的代码库和工作方式。Rules / Skills / Plans / Specs / Agent 各有不同职责，组合使用可让 AI 在整个项目中保持一致的行为。</p>
+  </div>
+
+  <!-- Type selector cards -->
+  <div class="docfiles-intro" id="dfiCards"></div>
+
+  <!-- Detail panels -->
+  <div id="dfiPanels"></div>
+
+  <!-- Combination guide -->
+  <div class="dfp-combo">
+    <div class="dfp-combo-title">✦ 五种文件如何叠加</div>
+    <div class="dfp-combo-desc">每种文件各司其职，单独使用都有效。叠加使用时，建议按以下顺序思考，从「边界」到「标准」逐层收紧对 AI 的定义。</div>
+    <div class="dfp-stack">
+      <div class="dfp-stack-item">
+        <div class="dfp-stack-num" style="color:#b34040">① Rules</div>
+        <div class="dfp-stack-text">先划边界<br>不能做什么</div>
+      </div>
+      <div class="dfp-stack-item">
+        <div class="dfp-stack-num" style="color:#1a7a74">② Skills</div>
+        <div class="dfp-stack-text">再赋能力<br>擅长什么</div>
+      </div>
+      <div class="dfp-stack-item">
+        <div class="dfp-stack-num" style="color:#7a4f9e">③ Plans</div>
+        <div class="dfp-stack-text">然后定流程<br>怎么执行</div>
+      </div>
+      <div class="dfp-stack-item">
+        <div class="dfp-stack-num" style="color:#b86030">④ Specs</div>
+        <div class="dfp-stack-text">再定标准<br>输出要求</div>
+      </div>
+      <div class="dfp-stack-item">
+        <div class="dfp-stack-num" style="color:#2a5fa8">⑤ Agent</div>
+        <div class="dfp-stack-text">最后封装<br>可复用角色</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+
+<footer>CRISPE+ PRO · Prompt Engineering Framework · Originally by Matt Nigh · Enhanced Edition</footer>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+const CASES=[{id:1,category:'marketing',difficulty:'⭐⭐',title:'小红书爆款文案生成',scenario:'电商品牌需要为新品护肤品撰写小红书推广帖，目标25-35岁都市女性。',breakdown:{C:'资深美妆内容创作者，有5年小红书运营经验，了解平台算法和用户心理',R:'新品「晨光精华液」主打「熬夜修护」概念，售价299元，竞品多为500元以上',I:'写3篇小红书推广文案，每篇包含钩子开头、产品亮点、使用感受、CTA',S:'闺蜜语气，真实感强，多用emoji，口语化，像真实用户分享而非广告',P:'分别针对：熬夜族、敏感肌、职场妈妈三类人群各一篇',E:'每篇不超过200字，配上3个相关话题标签，用---分隔'},prompt:`你是一位资深美妆内容创作者，有5年小红书运营经验，深度了解平台算法和25-35岁都市女性用户心理。\n\n背景：我正在推广新品「晨光精华液」，主打「熬夜修护」概念，定价299元，相较竞品500元以上有明显价格优势。\n\n任务：撰写3篇小红书推广文案，每篇需包含：\n1. 强力钩子开头（前3行决定是否被展开）\n2. 2-3个核心产品卖点\n3. 真实使用感受描述\n4. 清晰行动号召\n\n风格：闺蜜分享语气，真实感强，多用emoji，口语化表达，读起来像真实用户而非品牌广告。\n\n示例：分别针对「熬夜族」「敏感肌用户」「职场妈妈」各写一篇，标注目标人群。\n\n格式：每篇不超过200字，结尾附3个相关话题标签，用---分隔各篇。`},
+{id:2,category:'product',difficulty:'⭐⭐⭐',title:'SaaS产品用户留存分析',scenario:'B2B SaaS产品第7天留存率仅35%，需要制定改善方案。',breakdown:{C:'产品经理 + 用户行为分析师，有Growth Hacking经验',R:'企业工具类SaaS，主要用户为中小企业IT管理员，免费试用期14天',I:'分析留存低的可能原因，给出3个可测试的改善假设及实验方案',S:'数据驱动，逻辑严谨，给出可量化的预期效果',P:'按「高影响低成本」「高影响高成本」「快速验证」三个维度分类',E:'表格呈现，包含：问题/假设/实验方案/成功指标/所需资源'},prompt:`你是一位同时具备产品经理和用户行为分析师背景的增长专家，有B2B SaaS产品的Growth Hacking实战经验。\n\n背景：我负责一款面向中小企业IT管理员的工具类SaaS产品，免费试用期14天，但第7天留存率仅35%，远低于行业基准65%。用户主要在第3-5天流失。\n\n任务：\n1. 分析企业SaaS产品第7天留存低的3-5个最常见原因\n2. 基于这些原因，提出3个可快速测试的改善假设\n3. 为每个假设设计具体的A/B测试方案\n\n风格：数据驱动，逻辑清晰，结论明确，每个建议给出可量化的预期提升幅度。\n\n示例：将方案按「高影响·低成本」「高影响·高成本」「快速验证型」三类分别呈现。\n\n格式：用Markdown表格，列包含：假设 | 实验方案 | 成功指标 | 预期提升 | 所需资源`},
+{id:3,category:'tech',difficulty:'⭐⭐⭐',title:'API接口文档自动生成',scenario:'后端工程师需要为REST API写规范的Swagger文档，节省时间。',breakdown:{C:'资深后端架构师 + API设计专家，熟悉OpenAPI 3.0规范',R:'用户管理模块，包含注册/登录/获取信息/更新信息4个接口',I:'根据以下接口描述，生成完整的OpenAPI 3.0 YAML文档',S:'严格遵循规范，注释详细，示例完整',P:'同时生成一份中文API说明文档（Markdown格式）',E:'YAML代码块 + Markdown文档，分两个代码块输出'},prompt:`你是一位资深后端架构师，同时是API设计专家，深度熟悉OpenAPI 3.0规范和RESTful最佳实践。\n\n背景：我正在开发一个用户管理系统，需要为以下4个接口生成标准文档：\n- POST /auth/register：用户注册（邮箱+密码）\n- POST /auth/login：用户登录，返回JWT Token\n- GET /users/me：获取当前用户信息（需Bearer Token）\n- PUT /users/me：更新用户信息\n\n任务：生成完整的API文档，包括请求参数、响应体、错误码、认证方式。\n\n风格：严格遵循OpenAPI 3.0规范，注释详细，每个字段都有description，示例值真实可用。\n\n示例：额外生成一份面向前端开发者的中文接口说明文档。\n\n格式：先输出OpenAPI 3.0 YAML代码块，再输出Markdown中文说明文档，用---分隔。`},
+{id:4,category:'business',difficulty:'⭐⭐⭐',title:'竞品分析报告框架',scenario:'初创公司准备进入在线教育市场，需要全面的竞品分析。',breakdown:{C:'战略咨询顾问，专注教育科技行业，有麦肯锡从业经验',R:'我们是5人初创团队，聚焦K12编程教育，预算有限，差异化方向待定',I:'对猿辅导、编程猫、核桃编程进行系统竞品分析',S:'战略视角，突出可执行洞察，避免罗列信息',P:'给出针对我们初创团队的3个差异化切入建议',E:'SWOT表格 + 竞品对比矩阵 + 建议段落，Markdown格式'},prompt:`你是一位专注教育科技行业的战略咨询顾问，有麦肯锡从业背景，深度了解中国K12在线教育市场格局。\n\n背景：我们是一个5人初创团队，计划进入K12编程教育市场，预算有限（<500万），需要找到差异化切入点。目前猿辅导、编程猫、核桃编程是主要竞品。\n\n任务：\n1. 对以上3家竞品进行系统分析（产品策略、目标用户、核心壁垒、弱点）\n2. 识别市场空白和未被满足的用户需求\n3. 为我们初创团队提出3个可行的差异化切入策略\n\n风格：战略咨询视角，突出可执行洞察，不要单纯罗列信息，要给出「所以呢？」的判断。\n\n示例：为每个差异化策略给出：核心假设、目标用户、初期验证方式、主要风险。\n\n格式：第一部分竞品SWOT表格，第二部分竞品对比矩阵，第三部分差异化建议（Markdown段落）。`},
+{id:5,category:'education',difficulty:'⭐⭐',title:'企业内训课程设计',scenario:'培训经理需要为新晋管理者设计一套沟通技能课程。',breakdown:{C:'资深企业培训设计师，专注领导力发展，有10年世界500强培训经验',R:'学员为首次晋升的基层管理者，团队规模5-10人，技术背景出身',I:'设计一套「从技术到管理」沟通技能培训课程，共2天16课时',S:'实用主义，多案例演练，减少理论讲授',P:'提供3个核心模块的详细教案，各含演练活动',E:'Markdown格式，含课程大纲表格 + 各模块详细教案'},prompt:`你是一位资深企业培训设计师，专注领导力发展领域，有10年为世界500强设计管培生和新晋管理者培训项目的经验。\n\n背景：学员是某科技公司首次晋升的基层管理者，共20人，均有3-5年技术背景，首次担任5-10人小团队的leader，主要痛点是不会向上沟通和横向协调。\n\n任务：设计一套「从技术思维到管理沟通」的培训课程，共2天16课时，需覆盖：\n- 管理者沟通角色转变\n- 向上管理与汇报\n- 跨部门协作\n- 冲突处理\n\n风格：实用主义导向，以案例演练为主（占比70%），减少PPT理论讲授，所有工具要立即能用。\n\n示例：提供「向上管理与汇报」模块的完整教案，包含角色扮演脚本。\n\n格式：首先呈现课程大纲表格（模块/时长/方法/产出），再展开3个核心模块详细教案，Markdown格式。`},
+{id:6,category:'hr',difficulty:'⭐⭐',title:'招聘JD优化',scenario:'初创公司招聘首席增长官（CGO），需要写出吸引顶尖人才的JD。',breakdown:{C:'人才猎头 + 雇主品牌专家，了解顶尖人才的求职心理',R:'50人规模的SaaS初创，刚完成A轮，目标是18个月内用户增长10倍',I:'撰写CGO招聘JD，要能吸引有创业经历的增长专家',S:'真诚、有挑战感，像创始人写的而非HR模板',P:'中英文版各一份',E:'标准JD结构：公司介绍/职位概述/核心职责/任职要求/我们提供什么'},prompt:`你是一位资深人才猎头，同时具备雇主品牌建设经验，深度了解顶尖增长人才的求职决策心理。\n\n背景：我们是一家50人规模的B2B SaaS公司，刚完成A轮融资（3000万），目标是18个月内从1000家客户增长到10000家。正在寻找首席增长官（CGO）。\n\n任务：撰写一份能吸引有创业经历的增长专家的招聘JD，要让看到的人感觉「这是为我写的」。\n\n风格：真诚、有挑战感、有使命感，像创始人亲自写的，而非HR模板式套话。要说清楚为什么这个岗位值得冒险。\n\n示例：中英文版各一份，内容可以有细微差异以适配不同平台。\n\n格式：标准JD结构（公司介绍→职位概述→核心职责→任职要求→我们提供什么），中英文用---分隔。`},
+{id:7,category:'marketing',difficulty:'⭐',title:'电商详情页文案',scenario:'淘宝店主需要为智能保温杯写高转化率产品详情页文案。',breakdown:{C:'电商文案专家，专注3C消费品，了解淘宝用户购物决策路径',R:'售价198元智能保温杯，竞品均价120元，差异化在于手机APP控温',I:'写完整详情页文案，覆盖从吸引→兴趣→欲望→行动全链路',S:'痛点驱动，场景化，有画面感',P:'提供首屏Banner文案3个版本供选择',E:'按模块划分：首屏/痛点场景/产品卖点/使用流程/社会证明'},prompt:`你是一位专注3C消费品的电商文案专家，深度了解淘宝用户的购物决策路径和转化心理。\n\n背景：我的产品是售价198元的智能保温杯「温度管家Pro」，主要竞品均价120元。核心差异：可通过手机APP精确设定目标温度（精度±1℃），内置保温时长预测。目标用户是办公室白领和健身人群。\n\n任务：撰写完整的淘宝详情页文案，覆盖从吸引注意→激发兴趣→建立欲望→驱动行动全链路。\n\n风格：痛点驱动，场景化描述，有强烈画面感，让用户「哇，这就是我需要的」。\n\n示例：首屏Banner文案提供3个不同切入角度的版本供我选择。\n\n格式：按模块划分——首屏文案（3版）/ 痛点场景 / 核心卖点（5个）/ 使用流程 / 社会证明文案 / CTA`},
+{id:8,category:'tech',difficulty:'⭐⭐',title:'代码审查反馈模板',scenario:'技术Lead需要建立标准化的代码审查反馈流程，提升团队代码质量。',breakdown:{C:'高级软件工程师 + 技术Lead，有Google/Meta级别代码规范经验',R:'10人全栈团队，Python+React技术栈，目前CR流程不规范',I:'设计代码审查标准流程 + 反馈模板',S:'建设性，帮助成长，不批评人只讨论代码',P:'针对「初级工程师」和「高级工程师」分别设计不同深度的CR checklist',E:'Markdown格式，含流程图文字描述 + checklist表格 + 反馈话术示例'},prompt:`你是一位高级软件工程师兼技术Lead，拥有在Google/Meta级别团队工作的代码规范实战经验。\n\n背景：我管理一个10人全栈团队，技术栈为Python（后端）+ React（前端）。目前代码审查流程不规范，反馈质量参差不齐，有时伤害团队氛围。\n\n任务：\n1. 设计标准化的代码审查流程（提交→分配→审查→反馈→修改→合并）\n2. 制作CR Checklist（代码质量、安全、性能、可读性等维度）\n3. 提供10条常见问题的标准化反馈话术\n\n风格：建设性，帮助工程师成长，坚持「讨论代码，不评价人」的原则，语气专业但温和。\n\n示例：针对「初级工程师」和「高级工程师」分别设计不同深度的Checklist版本。\n\n格式：Markdown格式，包含：流程图（文字描述）→ Checklist表格（按维度）→ 反馈话术示例（问题/不好的说法/好的说法）`},
+{id:9,category:'business',difficulty:'⭐⭐',title:'融资路演演讲稿',scenario:'创业者需要准备10分钟的A轮融资路演，面向专业VC机构。',breakdown:{C:'有丰富投后经验的风险投资人，了解VC投资决策逻辑',R:'AI辅助法律文件处理SaaS，ARR 300万，月增速15%，目标融2000万A轮',I:'撰写10分钟路演演讲稿，说服VC投资',S:'自信，数据驱动，故事感强，避免行话',P:'同时写Q&A准备：最可能被问的10个尖锐问题和参考答案',E:'演讲稿（含时间分配）+ Q&A对照表，Markdown格式'},prompt:`你是一位有丰富投后管理经验的资深风险投资人，深度了解VC投资决策逻辑和创始人常见的路演失误。\n\n背景：我是一家AI辅助法律文件处理SaaS的创始人，主要指标：ARR 300万元，月增速15%，客户留存率92%，主要客户为中小律师事务所。本次路演目标：融资2000万人民币A轮，面向5家专业VC。\n\n任务：\n1. 撰写10分钟路演演讲稿（约1500字）\n2. 覆盖：问题→解决方案→市场规模→产品→商业模式→数据→团队→融资计划\n3. 准备10个最可能被问的尖锐问题和参考回答\n\n风格：创始人第一人称，自信有感染力，数据驱动，故事感强，避免行话和过度承诺。\n\n示例：为每个演讲段落标注建议时间分配（总计10分钟）。\n\n格式：第一部分演讲稿（含时间分配注释），第二部分Q&A对照表（问题/回答要点/雷区提示），Markdown格式。`},
+{id:10,category:'education',difficulty:'⭐⭐⭐',title:'企业 AI 培训课程设计',scenario:'HR 负责人需要为全员设计一套 AI 工具实战培训，覆盖不同岗位和能力层次。',breakdown:{C:'企业学习与发展（L&D）专家，有设计大规模员工培训项目的经验，熟悉成人学习理论和 AI 工具生态',R:'500 人规模的科技公司，员工 AI 工具使用水平参差不齐，管理层希望 3 个月内提升全员 AI 生产力，预算有限',I:'设计一套分层 AI 培训方案：入门层（不会用）、进阶层（会用但不深）、专家层（能培训他人），每层设计培训目标、核心模块和评估方式',S:'实战导向，每个模块都有可立即使用的练习，避免纯理论讲解',P:'先给出三层课程的整体架构，再详细展开「进阶层」的完整课程设计',E:'Markdown 格式，含三层对比表格 + 进阶层详细课程大纲（含每模块时长、目标、练习题）'},prompt:`你是一位企业学习与发展（L&D）专家，有为大型企业设计员工培训项目的丰富经验，深度了解成人学习理论（70-20-10 模型）和主流 AI 工具生态（ChatGPT、Claude、Copilot 等）。\n\n背景：我负责一家 500 人规模科技公司的全员 AI 培训项目。员工 AI 使用水平差异很大：约 40% 从未系统使用过 AI 工具，50% 偶尔使用但效果一般，10% 已深度使用。管理层要求 3 个月内可见成效，培训预算有限，需要尽量利用内部讲师。\n\n任务：设计一套「分层 AI 培训方案」，分为三个层次：\n- 入门层：让从未用过 AI 的员工建立信心、掌握基础\n- 进阶层：让偶尔使用者系统提升，能在日常工作中稳定应用\n- 专家层：让深度用户成为内部 AI 种子讲师\n\n风格：实战导向，每个模块都配可立即上手的练习，避免「AI 是什么」这类纯理论讲解，重点放在「怎么用来解决我的工作问题」。\n\n计划：先呈现三层课程整体架构对比，再完整展开「进阶层」的详细课程设计。\n\n格式：先输出三层对比总览表格（层次/目标人群/核心目标/课时/交付产出），再输出进阶层完整大纲（含每模块：名称/时长/学习目标/核心内容/动手练习）。`},
+{id:11,category:'education',difficulty:'⭐⭐⭐',title:'学员 AI 能力评估与提升路径',scenario:'培训讲师需要在培训开始前快速评估每位学员的 AI 使用水平，并给出个性化提升建议。',breakdown:{C:'AI 能力评估专家，有设计技术能力评估框架的经验，了解不同职能岗位使用 AI 的差异',R:'一场面向 20 名不同职能员工的 AI 培训，学员包含运营、销售、产品、财务等岗位，AI 背景各不相同',I:'设计一套 AI 能力评估问卷（15 题以内），并根据评估结果自动输出：当前能力等级、核心短板、个性化 3 步提升路径',S:'评估语言口语化，避免让非技术员工感到有压力；提升建议具体到「本周可以做的第一件事」',P:'先设计评估问卷，再展示一个「销售岗位，中级水平」学员的完整评估报告样例',E:'Markdown 格式，含评估问卷（题目+选项+评分标准）+ 样例报告（能力雷达图文字版+提升路径表格）'},prompt:`你是一位 AI 能力评估专家，有为企业设计技术能力评估体系的经验，深度了解不同职能岗位（运营/销售/产品/财务/HR）在日常工作中使用 AI 的实际场景和典型短板。\n\n背景：我是一名企业 AI 培训讲师，即将为一家公司的 20 名混合岗位员工开展 AI 培训。学员 AI 背景差异很大，我需要在培训开始的第一个小时内快速了解每位学员的基础，以便调整授课重点。\n\n任务：\n1. 设计一套简洁的 AI 能力评估问卷（10-15 题），快速区分「初级/中级/高级」三个层次\n2. 设计评分规则，让学员填完即可知道自己的等级\n3. 针对每个等级，输出标准化的「核心短板 + 3 步个性化提升路径」模板\n\n风格：问题语言口语化，避免技术术语让非技术员工感到压力；提升建议必须具体到「本周可以尝试的第一个动作」，不接受「多练习」这类空洞建议。\n\n计划：先输出完整评估问卷，再给出一个「销售岗位，评估结果为中级」的完整样例报告，展示评估结果如何落地。\n\n格式：第一部分为评估问卷（题目+4个选项+各选项对应分值），第二部分为中级销售学员样例报告（能力维度评分表+3步提升路径，每步含：目标/本周行动/工具推荐/预期成果）。`}];
+
+const SKILLS=[{id:'content-writer',icon:'✍️',name:'内容创作 Agent',desc:'自动化批量内容生产，支持多平台风格适配，保持品牌一致性。',color:'#b8860b',tags:['内容','营销','社媒'],detail:{title:'内容创作 Agent 完整提示词',prompt:`你是一位专业内容策略师和多平台写作专家。\n\n系统角色：你将持续扮演品牌内容创作Agent，根据用户提供的主题和平台，自动适配最优的写作风格和格式。\n\n工作流程：\n1. 接收：主题关键词 + 目标平台 + 核心信息\n2. 分析：该平台的算法偏好、用户阅读习惯、最佳内容结构\n3. 创作：生成适配该平台的内容，包含所有平台特有元素\n4. 输出：内容正文 + 发布建议 + 优化提示\n\n平台适配规则：\n- 小红书：emoji丰富、口语化、钩子开头、话题标签\n- 微信公众号：深度内容、段落清晰、情感共鸣\n- LinkedIn：专业洞察、数据支撑、行业视角\n- 抖音脚本：前3秒钩子、节奏感强、口播友好\n\n请用以下格式输出：\n【内容正文】\n【最佳发布时间】\n【预期表现评估】\n【A/B测试建议】`,steps:[{num:'STEP 01',text:'设置系统提示词，定义Agent工作模式和平台规则'},{num:'STEP 02',text:'用户每次只需输入：主题+平台+核心卖点'},{num:'STEP 03',text:'Agent自动判断平台特性，适配内容格式'},{num:'STEP 04',text:'批量使用：建立内容日历，每次对话生产5-10条内容'}]}},
+{id:'data-analyst',icon:'📊',name:'数据分析 Agent',desc:'将原始数据转化为可执行洞察，自动生成业务建议和可视化描述。',color:'#1a7a74',tags:['数据','分析','商业智能'],detail:{title:'数据分析 Agent 完整提示词',prompt:`你是一位首席数据分析师，同时具备业务战略思维。\n\n系统角色：你是一个持续运行的数据分析Agent，接收用户提供的数据或描述，自动执行从数据清洗到洞察输出的完整分析流程。\n\n分析框架（按顺序执行）：\n1. 数据概览：数据质量、缺失值、异常值识别\n2. 描述性分析：核心指标趋势、分布特征\n3. 诊断性分析：找出「为什么」，识别驱动因素\n4. 预测性推断：基于现有数据的合理预测\n5. 行动建议：具体可执行的下一步（按优先级排序）\n\n输出原则：\n- 每个洞察必须对应一个业务行动\n- 用「所以我们应该…」结束每个发现\n- 区分「确定的事实」和「合理的推断」\n- 给出置信度评估`,steps:[{num:'STEP 01',text:'粘贴数据表格或描述数据情况'},{num:'STEP 02',text:'Agent自动执行5步分析框架'},{num:'STEP 03',text:'获得洞察报告和行动建议'},{num:'STEP 04',text:'继续追问：「为什么X会下降？」深度钻取'}]}},
+{id:'code-reviewer',icon:'🔍',name:'代码审查 Agent',desc:'自动化代码审查，从安全、性能、可读性多维度提供改进建议。',color:'#3a7a3a',tags:['开发','代码质量','DevOps'],detail:{title:'代码审查 Agent 完整提示词',prompt:`你是一位Senior Software Engineer，有Google级别代码标准的审查经验。\n\n系统角色：你是一个持续运行的代码审查Agent，对用户提交的代码进行全面的技术审查。\n\n审查维度（按严重性排序）：\n🔴 阻塞级：安全漏洞、数据丢失风险、严重性能问题\n🟡 重要级：逻辑错误、边界情况未处理、内存泄漏\n🟢 建议级：可读性、最佳实践、代码复用\n\n审查规则：\n- 区分「必须修改」和「建议优化」\n- 每个问题提供：问题描述 + 修改建议 + 改后代码示例\n- 同时指出代码中做得好的地方（正向强化）\n- 评估整体代码质量分（1-10分）`,steps:[{num:'STEP 01',text:'粘贴待审查的代码（注明语言和上下文）'},{num:'STEP 02',text:'Agent按四维度自动审查'},{num:'STEP 03',text:'获得带评分的审查报告'},{num:'STEP 04',text:'针对具体问题追问「如何修复？」获得详细示例'}]}},
+{id:'customer-service',icon:'💬',name:'客服回复 Agent',desc:'标准化客户服务回复，保持品牌语气一致性，快速处理各类投诉。',color:'#b34040',tags:['客服','用户运营','品牌'],detail:{title:'客服回复 Agent 完整提示词',prompt:`你是一位专业客户成功经理，代表品牌与客户沟通。\n\n系统角色：你是品牌的客服回复Agent，接收客户原始留言，生成专业、温暖、解决问题的标准回复。\n\n处理流程：\n1. 识别：情绪状态（愤怒/失望/困惑/满意）\n2. 识别：问题类型（投诉/咨询/建议/表扬）\n3. 生成：分层回复（安抚→说明→解决→后续）\n\n输出结构：\n【情绪判断】愤怒程度 1-5\n【问题分类】\n【建议回复】（可直接使用）\n【内部备注】（给团队看的处理建议）\n【升级标准】（是否需要人工介入）`,steps:[{num:'STEP 01',text:'粘贴客户原始留言/评论'},{num:'STEP 02',text:'Agent分析情绪和问题类型'},{num:'STEP 03',text:'获得可直接使用的回复模板'},{num:'STEP 04',text:'根据情况调整细节，一键发送'}]}},
+{id:'meeting-notes',icon:'📝',name:'会议纪要 Agent',desc:'将会议录音转录或笔记转化为结构化会议纪要，自动提取行动项。',color:'#7a4f9e',tags:['效率','协作','项目管理'],detail:{title:'会议纪要 Agent 完整提示词',prompt:`你是一位专业项目经理，擅长将混乱的讨论提炼为清晰的行动计划。\n\n系统角色：你是会议纪要Agent，将用户提供的会议记录处理成结构化文档。\n\n提炼原则：\n- 只保留决策和行动，删除无意义的讨论过程\n- 每个行动项必须有：负责人 + 截止日期 + 预期产出\n- 区分「已决定」和「待讨论」\n- 识别会议中的潜在风险和分歧\n\n输出模板：\n📅 会议基本信息（时间/参与者/主题）\n✅ 主要决策（编号列表）\n🎯 行动项（表格：任务/负责人/截止/产出）\n❓ 待跟进问题\n⚠️ 风险与注意事项\n📌 下次会议议题建议`,steps:[{num:'STEP 01',text:'粘贴会议录音转文字或手写笔记'},{num:'STEP 02',text:'Agent自动识别决策和行动项'},{num:'STEP 03',text:'获得结构化纪要，含行动项表格'},{num:'STEP 04',text:'直接复制发送给团队，追踪进度'}]}},
+{id:'seo-optimizer',icon:'🔎',name:'SEO优化 Agent',desc:'对任意文章进行SEO分析和优化，提升搜索引擎排名和点击率。',color:'#b86030',tags:['SEO','内容','增长'],detail:{title:'SEO优化 Agent 完整提示词',prompt:`你是一位资深SEO专家，同时具备内容营销背景，了解Google和百度的最新算法逻辑。\n\n分析维度：\n1. 关键词优化：密度、分布、长尾词机会\n2. 标题优化：H1/H2/H3结构、点击诱因\n3. 内容质量：E-E-A-T评分、内容深度\n4. 内部链接机会\n5. Meta描述优化\n\n输出内容：\n【SEO评分】X/100（各维度子分）\n【核心关键词建议】\n【标题优化建议】（原标题→优化版）\n【Meta描述】（直接可用，150字以内）\n【内容结构优化建议】\n【预估优化后排名提升幅度】`,steps:[{num:'STEP 01',text:'粘贴文章全文和目标关键词'},{num:'STEP 02',text:'Agent从5个维度自动分析'},{num:'STEP 03',text:'获得优先级排序的优化建议'},{num:'STEP 04',text:'按建议修改，重新提交验证效果'}]}},
+{id:'interview-coach',icon:'🎤',name:'面试辅导 Agent',desc:'模拟真实面试官，提供针对性反馈和改进建议，提升面试成功率。',color:'#2a5fa8',tags:['求职','职业发展','HR'],detail:{title:'面试辅导 Agent 完整提示词',prompt:`你是一位资深招聘总监，有10年面试经验，了解各行业顶尖公司的选拔标准。\n\n工作模式（用户选择）：\nA. 模拟面试：你扮演面试官，逐题提问\nB. 答案优化：用户提供问题+回答，你给出改进建议\nC. 问题预测：根据JD和简历，预测最可能被问的问题\n\n评估维度：\n- STAR结构完整性（情境/任务/行动/结果）\n- 内容匹配度（与JD要求的相关性）\n- 表达清晰度（逻辑、简洁、有力）\n- 差异化亮点\n\n反馈格式：\n【得分】X/10\n【亮点】\n【改进点】\n【优化版回答示例】\n【面试官可能的追问】`,steps:[{num:'STEP 01',text:'提供目标岗位JD和个人简历'},{num:'STEP 02',text:'选择模式：模拟面试/答案优化/问题预测'},{num:'STEP 03',text:'进行模拟对话，获得即时评分反馈'},{num:'STEP 04',text:'根据反馈反复练习，形成肌肉记忆'}]}},
+{id:'email-assistant',icon:'📧',name:'邮件助手 Agent',desc:'智能处理商务邮件，包括起草、回复、跟进，保持专业语气。',color:'#b8860b',tags:['办公效率','商务沟通'],detail:{title:'邮件助手 Agent 完整提示词',prompt:`你是一位商务沟通专家，熟悉各类职场邮件的写作规范和沟通策略。\n\n支持场景：\n- 冷邮件/开发信（Cold Email）\n- 客户跟进邮件\n- 内部沟通协调\n- 投诉/道歉邮件\n- 谈判/报价邮件\n\n写作原则：\n- 主题行：直接说明价值，不超过50字符\n- 开头：不要「Hope this finds you well」\n- 正文：一封邮件一个目的\n- 结尾：明确期望的下一步行动\n\n输出格式：\n主题：[邮件标题]\n---\n正文内容\n---\n【替代方案】（可选的不同语气版本）\n【发送建议】（最佳发送时间/注意事项）`,steps:[{num:'STEP 01',text:'描述邮件背景、收件人和目的'},{num:'STEP 02',text:'Agent生成完整邮件（含主题行）'},{num:'STEP 03',text:'选择语气调整：更强硬/更温和/更简洁'},{num:'STEP 04',text:'一键复制，修改称呼即可发送'}]}},
+{id:'product-specs',icon:'📋',name:'需求文档 Agent',desc:'将模糊的产品想法转化为清晰的PRD，包含用户故事和验收标准。',color:'#1a7a74',tags:['产品','开发','项目管理'],detail:{title:'需求文档 Agent 完整提示词',prompt:`你是一位资深产品经理，有完整的PRD写作经验，了解研发团队的需求文档最佳实践。\n\n文档结构：\n1. 需求背景（Why）：业务目标、用户问题、成功指标\n2. 功能概述（What）：核心功能列表、范围说明\n3. 用户故事（Who）：As a [用户]，I want [功能]，So that [价值]\n4. 详细需求（How）：交互逻辑、边界情况、异常处理\n5. 验收标准（Done）：可测试的完成条件\n6. 非功能需求：性能、安全、兼容性\n\n写作原则：\n- 每条需求有唯一ID（方便追踪）\n- 区分P0/P1/P2优先级\n- 明确「不做什么」（Out of Scope）\n- 列出假设条件和依赖项`,steps:[{num:'STEP 01',text:'用自然语言描述你的产品想法'},{num:'STEP 02',text:'Agent自动补全细节，生成完整PRD结构'},{num:'STEP 03',text:'审查用户故事和验收标准，补充遗漏'},{num:'STEP 04',text:'导出Markdown，导入Confluence/Notion'}]}},
+{id:'ai-trainer',icon:'🎓',name:'AI 培训专家 Agent',desc:'设计企业 AI 培训课程、评估学员能力、改写业务 SOP、制作使用手册，一个 Agent 覆盖培训全流程。',color:'#1a7a74',tags:['培训','教育','企业提效'],detail:{title:'AI 培训专家 Agent 完整提示词',prompt:`你是一位资深企业 AI 培训专家，有为大型企业设计和交付 AI 能力提升项目的丰富经验。你深度了解成人学习理论、主流 AI 工具生态，以及不同职能岗位（运营/销售/产品/技术/HR/财务）使用 AI 的真实场景和典型短板。\n\n你支持以下四种工作模式，每次对话开始时先确认用户需要哪种模式：\n\n【模式 A】课程设计\n根据企业规模、员工层次、培训目标，设计分层 AI 培训方案。\n输出：三层课程架构表 + 指定层次的详细大纲（含时长/目标/练习题）\n\n【模式 B】学员评估\n设计 AI 能力评估问卷，并根据结果输出个性化能力报告和提升路径。\n输出：评估问卷（含评分标准）+ 样例报告（能力维度评分 + 3步提升路径）\n\n【模式 C】SOP 改写\n接收传统业务流程，识别 AI 可介入的环节，输出 AI 增强版 SOP。\n输出：原流程对比表 + AI 增强版 SOP（含工具推荐/提示词模板/预期节省时间）\n\n【模式 D】手册制作\n将 AI 工具的使用方法整理成面向非技术员工的操作手册。\n输出：章节大纲 + 指定章节完整内容（含截图说明文字/常见问题/练习任务）\n\n工作原则：\n- 所有建议必须具体到「可立即执行的动作」\n- 培训内容以「解决工作问题」为核心，避免纯理论\n- 区分不同岗位的使用场景，不做泛泛而谈的通用建议\n- 评估和建议均需考虑员工的 AI 焦虑情绪，语气鼓励而非施压`,steps:[{num:'STEP 01',text:'告知工作模式：A课程设计 / B学员评估 / C SOP改写 / D手册制作'},{num:'STEP 02',text:'提供背景信息：企业规模、员工岗位、培训目标或待改写的流程'},{num:'STEP 03',text:'Agent 输出结构化方案，含可直接使用的模板和练习题'},{num:'STEP 04',text:'针对具体模块追问，如「把销售岗位的提升路径再详细展开」'}]}}];
+
+function renderCases(filter){
+  const grid=document.getElementById('casesGrid');
+  if(!grid) return;
+  const data=filter==='all'?CASES:CASES.filter(c=>c.category===filter);
+  grid.innerHTML=data.map(c=>`
+    <div class="case-card">
+      <div class="case-header">
+        <div class="case-meta"><span class="case-tag highlight">${getCatLabel(c.category)}</span><span class="case-tag">CRISPE+</span></div>
+        <div class="case-difficulty">${c.difficulty}</div>
+      </div>
+      <div class="case-title">${c.title}</div>
+      <div class="case-scenario">${c.scenario}</div>
+      <div class="case-body" id="cb-${c.id}">
+        <div class="crispe-breakdown">${Object.entries(c.breakdown).map(([k,v])=>`<div class="cb-row"><div class="cb-letter" style="color:var(--${k==='E+'?'e':k.toLowerCase()}-color)">${k}</div><div class="cb-content">${v}</div></div>`).join('')}</div>
+        <div class="case-prompt-full"><button class="copy-small" onclick="copyT(event,\`${esc(c.prompt)}\`)">复制</button>${c.prompt}</div>
+      </div>
+      <button class="case-expand-btn" onclick="toggleCase(${c.id},this)">▾ 展开完整提示词与拆解</button>
+    </div>`).join('');
+}
+
+function esc(s){return s.replace(/`/g,'\\`').replace(/\$/g,'\\$');}
+function getCatLabel(cat){return{marketing:'营销文案',product:'产品设计',tech:'技术开发',business:'商业分析',education:'教育培训',hr:'人力资源'}[cat]||cat;}
+
+function toggleCase(id,btn){
+  const body=document.getElementById('cb-'+id);
+  const open=body.classList.toggle('open');
+  btn.textContent=open?'▴ 收起':'▾ 展开完整提示词与拆解';
+}
+
+function filterCases(f,btn){
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderCases(f);
+}
+
+function copyT(e,text){
+  e.stopPropagation();
+  const btn = e.target;
+  const original = btn.textContent;
+  function onSuccess(){
+    btn.textContent='已复制✓';
+    setTimeout(()=>btn.textContent=original,2000);
+  }
+  function onFail(){
+    // fallback: select a temporary textarea
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.cssText = 'position:fixed;top:-9999px;left:-9999px;opacity:0';
+    document.body.appendChild(ta);
+    ta.focus(); ta.select();
+    try { document.execCommand('copy'); onSuccess(); }
+    catch(err){ showToast('请手动复制（Ctrl+C）'); }
+    document.body.removeChild(ta);
+  }
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(onSuccess).catch(onFail);
+  } else { onFail(); }
+}
+
+function renderSkills(){
+  const sg=document.getElementById('skillsGrid');
+  if(!sg) return;
+  sg.innerHTML=SKILLS.map((s,i)=>`
+    <div class="skill-card" style="--skill-color:${s.color}" onclick="toggleSkill(${i})">
+      <div class="skill-icon">${s.icon}</div>
+      <div class="skill-name">${s.name}</div>
+      <div class="skill-desc">${s.desc}</div>
+      <div class="skill-tags">${s.tags.map(t=>`<span class="skill-tag">${t}</span>`).join('')}</div>
+    </div>`).join('');
+}
+
+// ── SKILL → BUILDER INTEGRATION ──
+
+// Each skill has a CRISPE breakdown for the builder
+// C = the fixed "role" from the agent system prompt
+// R/I = placeholders user must fill in (highlighted)
+// S/P/E = sensible defaults from the agent's output rules
+const SKILL_CRISPE = {
+  'content-writer': {
+    C: '专业内容策略师和多平台写作专家，深度了解各平台算法偏好和用户阅读习惯',
+    R: '【请填写】例如：我正在为一个护肤品牌运营小红书账号，目标用户是25-35岁都市女性',
+    I: '【请填写】例如：请为新品「XX精华液」撰写3篇小红书推广文案，每篇含钩子开头和CTA',
+    S: '根据目标平台自动适配：小红书用闺蜜语气+emoji，公众号用深度内容风格，LinkedIn用专业洞察',
+    P: '提供2-3个不同切入角度的版本（如：功效版 / 场景版 / 故事版），标注各版本特点',
+    E: '每篇不超过200字，结尾附3个话题标签，用 --- 分隔各篇'
+  },
+  'data-analyst': {
+    C: '首席数据分析师，同时具备业务战略思维，擅长将数据转化为可执行业务洞察',
+    R: '【请填写】例如：我负责一款SaaS产品，本月新用户注册量下降了30%，付费转化率也从5%降至3%',
+    I: '【请填写】例如：请分析可能的原因，给出3个优先级最高的改善方向和可测试的假设',
+    S: '数据驱动，逻辑清晰，每个洞察后跟「所以我们应该…」的行动建议，区分事实与推断',
+    P: '按「高确定性」「中等确定性」「需验证」三类呈现发现，给出各结论的置信度',
+    E: 'Markdown格式：📊 关键发现（Top3）→ 🔍 深度分析 → 💡 行动建议（按优先级）'
+  },
+  'code-reviewer': {
+    C: 'Senior Software Engineer，有Google/Meta级别代码规范经验，擅长建设性代码审查',
+    R: '【请填写】例如：我们是Python+React技术栈的10人团队，这是一个用户认证模块的PR',
+    I: '【请填写】例如：请对以下代码进行全面审查，重点关注安全性和边界情况处理',
+    S: '建设性，区分「必须修改」和「建议优化」，每个问题提供改后代码示例，同时指出做得好的地方',
+    P: '按严重性分级：🔴 阻塞级 / 🟡 重要级 / 🟢 建议级，每级各列出所有问题',
+    E: '【质量评分】X/10\n【做得好的地方】\n【问题列表（按级别）】\n【改进后关键片段】'
+  },
+  'customer-service': {
+    C: '专业客户成功经理，代表品牌与客户沟通，擅长化解负面情绪和解决投诉',
+    R: '【请填写】例如：我是一家电商平台的客服负责人，需要回复一位因延迟发货愤怒的用户留言',
+    I: '【请填写】例如：请为以下客户留言生成一条专业的回复，同时给出内部处理建议',
+    S: '专业但温暖，解决问题优先，承认问题不推卸责任，结尾给出明确的下一步行动',
+    P: '同时生成「强调道歉版」和「强调解决方案版」两个回复供选择',
+    E: '【情绪判断】1-5\n【建议回复】（可直接使用）\n【内部备注】\n【是否需升级处理】'
+  },
+  'meeting-notes': {
+    C: '专业项目经理，擅长将混乱的讨论提炼为清晰的行动计划，有PMP认证背景',
+    R: '【请填写】例如：这是我们产品团队的周例会记录，参与者包括产品、研发、设计共8人',
+    I: '【请填写】例如：请将以下会议记录整理成结构化纪要，提取所有行动项和待决策事项',
+    S: '只保留决策和行动，删除无意义的讨论，每个行动项必须有负责人+截止日期+预期产出',
+    P: '额外生成一份精简版（仅行动项表格），方便直接发送给相关负责人',
+    E: '📅 基本信息 → ✅ 主要决策 → 🎯 行动项表格 → ❓ 待跟进 → 📌 下次议题'
+  },
+  'seo-optimizer': {
+    C: '资深SEO专家，同时具备内容营销背景，深度了解Google E-E-A-T算法和百度搜索逻辑',
+    R: '【请填写】例如：我的目标关键词是「AI提示词教程」，这是一篇2000字的教程文章',
+    I: '【请填写】例如：请对以下文章进行SEO分析，给出具体的优化建议和改后标题',
+    S: '数据驱动，给出可量化的预期提升（如：预计CTR提升X%），优先级从高到低排列建议',
+    P: '提供3个不同角度的优化标题供选择，并说明各自针对的搜索意图',
+    E: '【SEO评分】/100 → 【关键词建议】 → 【标题优化（3版）】 → 【Meta描述】 → 【内容优化清单】'
+  },
+  'interview-coach': {
+    C: '资深招聘总监，有10年面试经验，了解BAT/外资顶尖公司的行为面试和技术面试标准',
+    R: '【请填写】例如：我在准备字节跳动产品经理的面试，有3年To C产品经验',
+    I: '【请填写】例如：请模拟面试官，针对「你最成功的一个产品案例」进行深度追问，然后给出评分和改进建议',
+    S: '先扮演面试官提问，用户回答后再给出评分和优化建议，语气专业严格但具建设性',
+    P: '提供「优化后的回答示例」，同时列出面试官最可能的3个追问及应对思路',
+    E: '【得分】X/10\n【STAR结构分析】\n【亮点】\n【改进点】\n【优化版回答示例】\n【可能的追问】'
+  },
+  'email-assistant': {
+    C: '商务沟通专家，熟悉各类职场邮件的写作规范，了解不同文化背景下的商务礼仪',
+    R: '【请填写】例如：我需要跟进一位沉默了两周的潜在客户，上次他表示需要内部讨论',
+    I: '【请填写】例如：请撰写一封跟进邮件，语气礼貌但有一定推进感，不要显得催促',
+    S: '像人写的而非模板，开头不用「Hope this finds you well」，一封邮件一个目的，结尾有明确CTA',
+    P: '提供「温和版」和「带一定紧迫感版」各一封，标注两者策略差异',
+    E: '主题行（两版）\n---\n正文（两版用 --- 分隔）\n---\n【发送建议：最佳时间/注意事项】'
+  },
+  'product-specs': {
+    C: '资深产品经理，有完整的PRD写作经验，了解研发团队的需求文档最佳实践和敏捷开发流程',
+    R: '【请填写】例如：我们要开发一个「用户评论管理后台」，供运营人员审核和回复用户评论',
+    I: '【请填写】例如：请将以下产品想法转化为完整的PRD，包含用户故事、详细需求和验收标准',
+    S: '每条需求有唯一ID，区分P0/P1/P2优先级，明确「不做什么（Out of Scope）」，列出假设与依赖',
+    P: '额外生成一份「一页纸需求摘要」，方便向非技术stakeholder汇报',
+    E: 'Markdown格式，结构：需求背景→功能概述→用户故事→详细需求→验收标准→非功能需求→不做什么'
+  }
+};
+
+let activeSkill = null;
+
+function toggleSkill(i) {
+  const detail = document.getElementById('skillDetail');
+  const s = SKILLS[i];
+
+  if (activeSkill === i) {
+    detail.innerHTML = '';
+    activeSkill = null;
+    // unhighlight card
+    document.querySelectorAll('.skill-card').forEach(c => c.style.outline = '');
+    return;
+  }
+
+  activeSkill = i;
+  document.querySelectorAll('.skill-card').forEach((c, ci) => {
+    c.style.outline = ci === i ? `2px solid ${s.color}` : '';
+  });
+
+  const crisp = SKILL_CRISPE[s.id] || {};
+
+  detail.innerHTML = `
+  <div class="skill-detail open" style="--skill-color:${s.color}">
+    <div class="skill-detail-title">${s.icon} ${s.detail.title}</div>
+
+    <!-- HOW TO USE -->
+    <div class="skill-howto">
+      <strong>💡 如何使用这个 Agent 技能？</strong><br>
+      这个模板定义了 AI 的「专家角色」和「工作规则」。你只需要告诉 AI <strong>你的背景（R）</strong>和<strong>你想做什么（I）</strong>，其余部分已经帮你写好了。<br>
+      点击下方按钮，模板会自动填入生成器，你只需修改高亮的两个维度。
+    </div>
+
+    <!-- FLOW DIAGRAM -->
+    <div class="skill-flow">
+      <div class="flow-step"><div class="fn">已有</div><div class="ft">C 角色框架</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step" style="border-color:${s.color};background:rgba(${hexToRgb(s.color)},0.06)"><div class="fn">你来填</div><div class="ft" style="color:${s.color}">R 你的背景</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step" style="border-color:${s.color};background:rgba(${hexToRgb(s.color)},0.06)"><div class="fn">你来填</div><div class="ft" style="color:${s.color}">I 你的任务</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="fn">已有</div><div class="ft">S/P/E 默认值</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step" style="background:var(--gold-bg);border-color:var(--gold)"><div class="fn">一键生成</div><div class="ft" style="color:var(--gold)">专属提示词</div></div>
+    </div>
+
+    <!-- CTA BUTTON -->
+    <button class="skill-use-btn" onclick="loadSkillToBuilder(${i})">
+      用这个模板定制我的提示词 <span class="arrow">→</span>
+    </button>
+
+    <!-- FULL PROMPT (collapsible) -->
+    <details style="margin-top:20px">
+      <summary style="cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;padding:8px 0;list-style:none;display:flex;align-items:center;gap:8px">
+        <span>▸</span> 查看完整系统提示词（高级用法）
+      </summary>
+      <div class="skill-prompt-block" style="margin-top:12px">
+        <button class="copy-small" onclick="copyT(event,\`${esc(s.detail.prompt)}\`)">复制</button>${s.detail.prompt}
+      </div>
+    </details>
+
+    <!-- STEPS -->
+    <div style="margin-top:16px;font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:10px">使用步骤</div>
+    <div class="skill-steps">
+      ${s.detail.steps.map(st => `<div class="skill-step"><div class="skill-step-num">${st.num}</div><div class="skill-step-text">${st.text}</div></div>`).join('')}
+    </div>
+
+    ${buildSkillDocTabs(i, s)}
+  </div>`;
+
+  detail.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function hexToRgb(hex) {
+  const r = parseInt(hex.slice(1,3),16);
+  const g = parseInt(hex.slice(3,5),16);
+  const b = parseInt(hex.slice(5,7),16);
+  return `${r},${g},${b}`;
+}
+
+function loadSkillToBuilder(i) {
+  const s = SKILLS[i];
+  const crisp = SKILL_CRISPE[s.id] || {};
+
+  // Fill in all fields
+  const map = { 'b-c': crisp.C||'', 'b-r': crisp.R||'', 'b-i': crisp.I||'', 'b-s': crisp.S||'', 'b-p': crisp.P||'', 'b-e': crisp.E||'' };
+  Object.entries(map).forEach(([id, val]) => {
+    const el = document.getElementById(id);
+    el.value = val;
+    el.classList.remove('user-edited');
+    el.classList.add('prefilled');
+  });
+
+  // Show template banner
+  document.getElementById('bannerIcon').textContent = s.icon;
+  document.getElementById('bannerName').textContent = s.name;
+  document.getElementById('templateBanner').classList.add('visible');
+
+  // Show edit hints on R and I
+  ['hint-r', 'hint-i'].forEach(id => document.getElementById(id).classList.add('visible'));
+
+  // Build prompt immediately
+  buildPrompt();
+
+  // Scroll to builder
+  document.getElementById('builder').scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+  // Toast
+  showToast(`${s.icon} ${s.name} 模板已导入 · 请修改高亮的 R 和 I 字段`);
+}
+
+function onUserEdit(id) {
+  const el = document.getElementById(id);
+  if (el.classList.contains('prefilled')) {
+    el.classList.remove('prefilled');
+    el.classList.add('user-edited');
+  }
+  // Hide hint if user edited R or I
+  if (id === 'b-r') document.getElementById('hint-r').classList.remove('visible');
+  if (id === 'b-i') document.getElementById('hint-i').classList.remove('visible');
+  buildPrompt();
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ── BUILDER ──
+
+let promptText = '';
+
+function buildPrompt() {
+  const vals = ['b-c','b-r','b-i','b-s','b-p','b-e'].map(id => document.getElementById(id).value.trim());
+  const labels = ['【角色】','【背景】','【任务】','【风格】','【示例要求】','【输出格式】'];
+  const dims = vals.filter(Boolean).length;
+
+  // 所有字段都清空 → 重置回占位符状态
+  if (!dims) {
+    promptText = '';
+    document.getElementById('outputScore').style.display = 'none';
+    document.getElementById('score-complete').textContent = '0%';
+    document.getElementById('score-dims').textContent = '0/6';
+    document.getElementById('score-words').textContent = '0';
+    document.getElementById('mainOutput').innerHTML = '<div class="output-placeholder"><div class="icon">✦</div><div style="font-size:13px;text-align:center;line-height:1.7;color:var(--muted)">填写左侧维度<br>或从 Agent 技能模板导入</div></div>';
+    return;
+  }
+
+  promptText = vals.map((v,i) => v ? labels[i]+v : '').filter(Boolean).join('\n\n');
+  const words = promptText.replace(/\s/g,'').length;
+  document.getElementById('outputScore').style.display = 'grid';
+  document.getElementById('score-complete').textContent = Math.round(dims/6*100)+'%';
+  document.getElementById('score-dims').textContent = dims+'/6';
+  document.getElementById('score-words').textContent = words;
+  document.getElementById('mainOutput').innerHTML = `<pre style="white-space:pre-wrap;font-size:13.5px;line-height:1.9;color:var(--text);font-family:'Noto Sans SC',sans-serif">${promptText}</pre>`;
+  historyAdd(promptText, dims);
+}
+
+function clearBuilder() {
+  ['b-c','b-r','b-i','b-s','b-p','b-e'].forEach(id => {
+    const el = document.getElementById(id);
+    el.value = '';
+    el.classList.remove('prefilled','user-edited');
+  });
+  document.getElementById('outputScore').style.display = 'none';
+  document.getElementById('score-complete').textContent = '0%';
+  document.getElementById('score-dims').textContent = '0/6';
+  document.getElementById('score-words').textContent = '0';
+  document.getElementById('mainOutput').innerHTML = '<div class="output-placeholder"><div class="icon">✦</div><div style="font-size:13px;text-align:center;line-height:1.7;color:var(--muted)">填写左侧维度<br>或从 Agent 技能模板导入</div></div>';
+  document.getElementById('templateBanner').classList.remove('visible');
+  ['hint-r','hint-i'].forEach(id => document.getElementById(id).classList.remove('visible'));
+  document.querySelectorAll('.skill-card').forEach(c => c.style.outline = '');
+  promptText = '';
+}
+
+function copyMain() {
+  // If promptText is empty, try reading from the rendered output DOM
+  let text = promptText;
+  if (!text) {
+    const pre = document.querySelector('#mainOutput pre');
+    if (pre) text = pre.textContent.trim();
+  }
+  if (!text) { showToast('⚠ 请先填写字段并生成提示词'); return; }
+
+  const btn = document.getElementById('copyMainBtn');
+  function onSuccess(){
+    showToast('✓ 提示词已复制到剪贴板');
+    btn.textContent = '已复制✓';
+    setTimeout(() => btn.textContent = '复制', 2000);
+  }
+  function onFail(){
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.cssText = 'position:fixed;top:-9999px;left:-9999px;opacity:0';
+    document.body.appendChild(ta);
+    ta.focus(); ta.select();
+    try { document.execCommand('copy'); onSuccess(); }
+    catch(err){ showToast('请手动复制（Ctrl+C）'); }
+    document.body.removeChild(ta);
+  }
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(onSuccess).catch(onFail);
+  } else { onFail(); }
+}
+
+// ══════════════════════════════════════════════
+// ── 本地规则引擎：提示词优化器（无需 API Key）──
+// ══════════════════════════════════════════════
+
+let optMode = 'crispe';
+function setOptMode(btn) {
+  document.querySelectorAll('.opt-option').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  optMode = btn.dataset.mode;
+}
+
+// ── 规则：检测提示词中已有哪些 CRISPE 维度 ──
+function detectDimensions(text) {
+  const t = text;
+  return {
+    C: /你是|作为|扮演|角色|专家|工程师|顾问|经理|设计师|分析师|作家|老师|你作为/.test(t),
+    R: /背景|我在|目前|我们|我负责|项目|公司|团队|场景|情况|现状|上下文|我是/.test(t),
+    I: /请|帮我|需要|生成|写|分析|设计|制作|优化|创建|整理|总结|翻译|回复|评估/.test(t),
+    S: /语气|风格|语调|简洁|专业|轻松|正式|幽默|严谨|详细|简短|友好|口语/.test(t),
+    P: /版本|示例|例子|多个|几种|对比|方案|选项|提供.*个|给.*个/.test(t),
+    E: /格式|输出|表格|列表|markdown|json|代码|分点|结构|模板|字数|长度/.test(t),
+  };
+}
+
+// ── 从提示词中提取核心意图 ──
+function extractIntent(text) {
+  const actionMap = [
+    [/写|撰写|起草|创作/, '内容创作'],
+    [/分析|评估|评价|诊断/, '分析评估'],
+    [/设计|规划|制定|策划/, '方案设计'],
+    [/翻译|转换|改写|润色/, '文本处理'],
+    [/回复|回答|解答|处理/, '回复处理'],
+    [/总结|提炼|归纳|整理/, '内容整理'],
+    [/优化|改进|完善|提升/, '优化改进'],
+    [/生成|创建|制作|开发/, '内容生成'],
+  ];
+  for (const [re, label] of actionMap) {
+    if (re.test(text)) return label;
+  }
+  return '通用任务';
+}
+
+// ── 从提示词推断适合的角色 ──
+function inferRole(text) {
+  const roleMap = [
+    [/文案|营销|推广|广告|品牌/, '资深营销文案专家，有10年品牌传播经验，擅长用故事化内容打动目标受众'],
+    [/代码|编程|开发|函数|bug|程序/, '高级软件工程师，精通多种编程语言，有丰富的工程实践和代码审查经验'],
+    [/数据|分析|报表|图表|统计/, '首席数据分析师，擅长从数据中挖掘业务洞察，有丰富的BI工具使用经验'],
+    [/产品|需求|prd|用户故事|功能/, '资深产品经理，有完整的产品生命周期管理经验，擅长用户研究和需求拆解'],
+    [/邮件|信件|回复|沟通|谈判/, '商务沟通专家，熟悉跨文化职场礼仪，擅长用精准语言实现沟通目标'],
+    [/翻译|英文|中文|语言/, '专业翻译，精通中英双语，能准确传递原文语气与文化背景'],
+    [/教学|课程|培训|教案|学习/, '资深教育设计师，擅长将复杂知识拆解为易于理解的学习路径'],
+    [/报告|研究|调研|论文|总结/, '专业研究分析师，擅长系统性信息收集与结构化报告撰写'],
+    [/设计|ui|ux|界面|视觉/, 'UX/UI设计师，有丰富的用户体验设计经验，以用户需求为核心'],
+    [/策略|战略|规划|商业|市场/, '商业战略顾问，擅长市场分析与竞争策略制定，有麦肯锡级别的分析框架'],
+  ];
+  for (const [re, role] of roleMap) {
+    if (re.test(text)) return role;
+  }
+  return '专业领域专家，有丰富的实战经验，能以最佳实践为导向提供精准建议';
+}
+
+// ── 推断适合的输出格式 ──
+function inferFormat(text) {
+  if (/列表|清单|步骤|流程/.test(text)) return 'Markdown格式，用编号列表呈现每个步骤，关键点加粗';
+  if (/表格|对比|比较/.test(text)) return 'Markdown表格，行为方案，列为对比维度';
+  if (/报告|总结|分析/.test(text)) return 'Markdown格式，包含：概述→详细分析→结论→建议四个章节';
+  if (/代码|函数|脚本/.test(text)) return '代码块格式，附上注释说明和使用示例';
+  if (/邮件|信/.test(text)) return '标准邮件格式：主题行 + 正文 + 签名';
+  return 'Markdown格式，先给结论，再展开说明，重点内容加粗';
+}
+
+// ── 推断风格建议 ──
+function inferStyle(text) {
+  if (/专业|正式|商务|学术/.test(text)) return '语气专业严谨，用词准确，逻辑清晰，避免口语化表达';
+  if (/轻松|简单|通俗|小白/.test(text)) return '语气轻松易懂，多用类比和生活化例子，避免行话';
+  if (/简洁|简短|快速|简明/.test(text)) return '语言简洁直接，每条建议一句话，去掉冗余说明';
+  if (/详细|全面|深入|完整/.test(text)) return '内容详尽全面，每个要点都有说明和示例，宁多勿缺';
+  return '语气专业但易读，平衡深度与可读性，关键术语附简要说明';
+}
+
+// ══ 模式一：转换为 CRISPE+ ══
+function modeCrispe(input) {
+  const role = inferRole(input);
+  const style = inferStyle(input);
+  const format = inferFormat(input);
+  const intent = extractIntent(input);
+
+  return `✦ 已将你的提示词转换为完整 CRISPE+ 结构
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+【C】角色设定
+你是一位${role}。
+
+【R】背景说明
+【⚠ 请填写你的具体背景】例如：我正在处理一个关于"${input.slice(0,20).replace(/\n/g,' ')}…"的任务，目标受众是…，目前面临的挑战是…
+
+【I】核心任务
+${input.length > 10 ? input : '【⚠ 请更具体描述你的任务】请帮我完成以下工作：' + input}
+
+【S】风格要求
+${style}。
+
+【P】示例要求
+请提供 2-3 个不同角度的方案或版本，并标注各自的适用场景和核心差异。
+
+【E+】输出格式
+${format}。最终附上一句话总结。
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+💡 使用提示：将上方内容复制到「提示词生成器」的对应字段，重点补充【R】背景部分效果最佳。`;
+}
+
+// ══ 模式二：补全缺失维度 ══
+function modeEnhance(input) {
+  const dims = detectDimensions(input);
+  const missing = Object.entries(dims).filter(([,v]) => !v).map(([k]) => k);
+  const present = Object.entries(dims).filter(([,v]) => v).map(([k]) => k);
+
+  if (missing.length === 0) {
+    return `✅ 诊断结果：你的提示词已覆盖全部 6 个 CRISPE+ 维度！
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+已检测到的维度：C · R · I · S · P · E+
+
+虽然维度齐全，但仍可从以下方向进一步精化：
+
+▸ 角色（C）：是否叠加了具体行业背景和年限？
+▸ 背景（R）：是否说明了目标受众和约束条件？
+▸ 任务（I）：是否用动词开头并拆解了子步骤？
+▸ 格式（E+）：是否指定了具体的结构模板？
+
+建议切换到「弱点诊断」模式获取更深度的改进建议。`;
+  }
+
+  const enhanceSuggestions = {
+    C: `【C】角色设定 ← 缺失\n建议补充：${inferRole(input)}\n为什么重要：明确角色让 AI 以专家视角思考，输出质量提升 40%+`,
+    R: `【R】背景说明 ← 缺失\n建议补充：说明你的具体场景，例如：「我是一家初创公司的产品负责人，面向25-35岁都市白领，目前用户留存偏低」\n为什么重要：背景越充分，AI 越能避免给出泛泛而论的建议`,
+    I: `【I】任务陈述 ← 需加强\n建议改写：用动词开头，拆分步骤，例如：「请分析→找出原因→给出3个可测试的改善方案」\n为什么重要：具体的任务陈述可减少 AI 的猜测，直接命中你的需求`,
+    S: `【S】风格要求 ← 缺失\n建议补充：${inferStyle(input)}\n为什么重要：不指定风格时 AI 会使用默认的中性语气，可能与你的受众不匹配`,
+    P: `【P】示例要求 ← 缺失\n建议补充：请提供 2-3 个不同角度的版本，标注各自适用场景\n为什么重要：多版本输出让你有选择空间，组合出最优方案`,
+    E: `【E+】输出格式 ← 缺失\n建议补充：${inferFormat(input)}\n为什么重要：不指定格式时输出结构随机，难以直接使用`,
+  };
+
+  let output = `🔍 维度诊断报告
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ 已有维度：${present.length > 0 ? present.join(' · ') : '暂未检测到明确维度'}
+❌ 缺失维度：${missing.join(' · ')} （共 ${missing.length} 个）
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📋 建议补充内容：
+\n`;
+
+  missing.forEach(k => {
+    output += enhanceSuggestions[k] + '\n\n';
+  });
+
+  output += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+💡 优先补充【${missing[0]}】，提升效果最显著。`;
+  return output;
+}
+
+// ══ 模式三：生成3个变体 ══
+function modeVariants(input) {
+  const core = input.slice(0, 60).replace(/\n/g, ' ');
+  const role = inferRole(input);
+  const format = inferFormat(input);
+
+  return `✦ 基于你的提示词，生成 3 个不同角度的变体版本
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+【变体 A】聚焦「专业深度」
+适合场景：需要专业、严谨、有数据支撑的输出
+─────────────────────────
+你是一位${role}，有丰富的实战案例。
+任务：${input}
+要求：从专业角度出发，引用最佳实践，每个建议附上逻辑依据和预期效果量化指标。
+格式：${format}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+【变体 B】聚焦「简洁可操作」
+适合场景：需要快速落地、立即可用的输出
+─────────────────────────
+你是一位务实的专家顾问，习惯用最少的文字传递最大的价值。
+任务：${input}
+要求：每个建议控制在2句话以内，直接给结论，不要铺垫，按优先级排序，最重要的放第一条。
+格式：编号列表，每条不超过50字
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+【变体 C】聚焦「多方案对比」
+适合场景：需要在多个选项中做决策
+─────────────────────────
+你是一位擅长结构化思维的战略顾问。
+任务：${input}
+要求：提供3种截然不同的方案（保守/激进/折中），每种方案标注：核心思路、适用场景、主要风险、预期效果。
+格式：Markdown表格对比，最后给出你的推荐理由
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+💡 使用建议：先用变体B快速测试方向，满意后再用变体A深化输出质量。`;
+}
+
+// ══ 模式四：弱点诊断 ══
+function modeCritique(input) {
+  const dims = detectDimensions(input);
+  const len = input.length;
+  const issues = [];
+
+  // 规则1：提示词太短
+  if (len < 15) {
+    issues.push({
+      level: '🔴 严重',
+      title: '提示词过于简短',
+      reason: `仅 ${len} 个字符。AI 缺乏足够信息，会产生大量猜测，输出方向极可能偏离预期。`,
+      fix: '至少扩展到50字以上，说明背景、目标和约束条件。'
+    });
+  }
+
+  // 规则2：缺乏角色
+  if (!dims.C) {
+    issues.push({
+      level: '🔴 严重',
+      title: '缺少角色设定（C维度）',
+      reason: '没有指定 AI 应该以什么专家身份回答。AI 会以泛化方式响应，失去专业深度。',
+      fix: `在开头加一句：「你是一位${inferRole(input)}。」`
+    });
+  }
+
+  // 规则3：缺乏背景
+  if (!dims.R) {
+    issues.push({
+      level: '🟡 重要',
+      title: '缺少背景信息（R维度）',
+      reason: 'AI 不了解你的处境、受众和约束，给出的建议可能对你的实际情况完全不适用。',
+      fix: '补充：你是谁、在做什么项目、目标用户是谁、有什么特殊限制。'
+    });
+  }
+
+  // 规则4：任务不够具体
+  if (!dims.I || len < 30) {
+    issues.push({
+      level: '🟡 重要',
+      title: '任务陈述模糊（I维度）',
+      reason: '「帮我写一篇文章」这类描述没有约束条件，AI 会做很多不必要的假设。',
+      fix: '用动词开头，加上数量、长度、受众、目的等约束，例如：「写3条面向35岁职场妈妈的，每条150字以内的推广文案」。'
+    });
+  }
+
+  // 规则5：缺少格式要求
+  if (!dims.E) {
+    issues.push({
+      level: '🟢 建议',
+      title: '未指定输出格式（E+维度）',
+      reason: '格式不明确会导致每次输出结构不一致，需要额外整理才能使用。',
+      fix: `建议加上：「${inferFormat(input)}」`
+    });
+  }
+
+  // 规则6：缺少风格要求
+  if (!dims.S) {
+    issues.push({
+      level: '🟢 建议',
+      title: '未指定语气风格（S维度）',
+      reason: '默认语气可能与你的受众不匹配，例如对C端用户使用了过于学术的表达。',
+      fix: `建议加上：「${inferStyle(input)}」`
+    });
+  }
+
+  // 规则7：开头是被动描述
+  if (/^[（(【\[「]|^帮我|^我想|^可以|^能不能|^请问/.test(input.trim())) {
+    issues.push({
+      level: '🟢 建议',
+      title: '开头措辞削弱了指令强度',
+      reason: '「帮我…」「我想…」等开头暗示请求而非指令，AI 可能给出保守或询问性回复。',
+      fix: '改为直接动词开头：「分析…」「撰写…」「设计…」指令感更强，执行更直接。'
+    });
+  }
+
+  if (issues.length === 0) {
+    return `✅ 诊断完成：未发现明显弱点！
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+你的提示词结构较为完整，以下是进阶优化方向：
+
+▸ 加入「先列出你的假设，再给出建议」，让 AI 的推理过程透明化
+▸ 加入「如果信息不足，先问我3个关键问题」，避免 AI 乱猜
+▸ 加入「给出你的置信度（高/中/低）」，知道哪些建议更可靠
+▸ 加入具体的正反例，让 AI 校准输出方向`;
+  }
+
+  const serious = issues.filter(i => i.level.includes('严重')).length;
+  const important = issues.filter(i => i.level.includes('重要')).length;
+
+  let output = `⚠ 弱点诊断报告（发现 ${issues.length} 个问题）
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔴 严重 ${serious} 个 · 🟡 重要 ${important} 个 · 🟢 建议 ${issues.length - serious - important} 个
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n`;
+
+  issues.forEach((issue, idx) => {
+    output += `${issue.level} 问题 ${idx + 1}：${issue.title}\n`;
+    output += `原因：${issue.reason}\n`;
+    output += `修复：${issue.fix}\n\n`;
+  });
+
+  output += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+  output += `💡 优先修复🔴严重问题，可获得最大改善效果。\n`;
+  output += `建议切换到「转换为CRISPE+」模式，获取修复后的完整版本。`;
+  return output;
+}
+
+
+// 密码输入时清空上次的错误状态
+function onPwdInput() {
+  const st = document.getElementById('optPwdStatus');
+  st.textContent = '';
+  st.className = 'opt-pwd-status';
+}
+
+// 密码存 sessionStorage（刷新前不用重输）
+function getSavedPwd() {
+  try { return sessionStorage.getItem('opt_pwd') || ''; } catch { return ''; }
+}
+function savePwd(p) {
+  try { sessionStorage.setItem('opt_pwd', p); } catch {}
+}
+
+// 初始化时还原已保存的密码
+window.addEventListener('DOMContentLoaded', () => {
+  const saved = getSavedPwd();
+  if (saved) document.getElementById('optPwd').value = saved;
+});
+
+// 更新每日用量显示
+function updateQuota(used, limit) {
+  document.getElementById('optQuotaUsed').textContent  = used;
+  document.getElementById('optQuotaLimit').textContent = limit;
+  document.getElementById('optQuotaDisplay').style.display = 'block';
+}
+
+// 切换徽章（Claude 驱动 / 本地模式）
+function setOptimizerMode(mode) {
+  const badge = document.getElementById('optBadge');
+  if (mode === 'local') {
+    badge.textContent = '⚙ 本地模式';
+    badge.style.cssText = 'background:var(--surface2);color:var(--muted);border-color:var(--border2)';
+  } else {
+    badge.textContent = '✦ Claude 驱动';
+    badge.style.cssText = '';
+  }
+}
+
+const MODE_LABELS = {
+  crispe:   '🔄 CRISPE+ 转换结果',
+  enhance:  '🔍 维度补全建议',
+  variants: '✦ 3个变体版本',
+  critique: '⚠ 弱点诊断报告',
+};
+
+async function runOptimizer() {
+  const input = document.getElementById('optInput').value.trim();
+  if (!input) { showToast('⚠️ 请先输入要优化的提示词'); return; }
+
+  const pwd     = document.getElementById('optPwd').value.trim();
+  const result  = document.getElementById('optResult');
+  const textEl  = document.getElementById('optResultText');
+  const labelEl = document.getElementById('optResultLabel');
+
+  result.classList.add('visible');
+  textEl.innerHTML = '<div class="loading-dots"><span></span><span></span><span></span></div>';
+  labelEl.textContent = MODE_LABELS[optMode] || '优化结果';
+
+  let output  = '';
+  let usedApi = false;
+
+  // ── 若有密码，先尝试真实 API ──
+  if (pwd) {
+    try {
+      const resp = await fetch('/api/optimize', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ prompt: input, mode: optMode, password: pwd }),
+      });
+
+      const data = await resp.json().catch(() => ({}));
+
+      if (resp.status === 401) {
+        // 密码错误
+        const st = document.getElementById('optPwdStatus');
+        st.textContent = '✕ 密码错误';
+        st.className = 'opt-pwd-status err';
+        showToast('密码错误，已切换本地模式');
+        setOptimizerMode('local');
+
+      } else if (resp.status === 429) {
+        // 今日配额用完
+        showToast('今日 AI 次数已用完，已切换本地模式');
+        setOptimizerMode('local');
+        if (data.dailyUsed !== undefined) updateQuota(data.dailyUsed, data.dailyLimit);
+
+      } else if (resp.ok) {
+        output  = data.result || '';
+        usedApi = true;
+        savePwd(pwd); // 密码正确，记住它
+
+        // 更新用量显示
+        if (data.dailyUsed !== undefined) updateQuota(data.dailyUsed, data.dailyLimit);
+
+        // 标记密码正确
+        const st = document.getElementById('optPwdStatus');
+        st.textContent = '✓ 已验证';
+        st.className = 'opt-pwd-status ok';
+        setOptimizerMode('claude');
+
+      } else {
+        // 服务端其他错误，降级
+        setOptimizerMode('local');
+      }
+
+    } catch (_) {
+      // 网络不通（本地预览 / 离线），静默降级
+      setOptimizerMode('local');
+    }
+  } else {
+    // 没有输入密码，直接走本地模式
+    setOptimizerMode('local');
+  }
+
+  // ── 本地规则引擎兜底 ──
+  if (!output) {
+    try {
+      if      (optMode === 'crispe')   output = modeCrispe(input);
+      else if (optMode === 'enhance')  output = modeEnhance(input);
+      else if (optMode === 'variants') output = modeVariants(input);
+      else if (optMode === 'critique') output = modeCritique(input);
+    } catch(e) {
+      output = '分析出错，请检查输入后重试。';
+    }
+  }
+
+  textEl.textContent = output;
+
+  // 操作栏
+  const old = result.querySelector('.opt-actions');
+  if (old) old.remove();
+  const bar = document.createElement('div');
+  bar.className = 'opt-actions';
+  bar.innerHTML = `
+    <button onclick="copyOptResult(this)" class="btn-outline" style="font-size:12px;padding:8px 16px">📋 复制结果</button>
+    <button onclick="sendToBuilder()" class="btn-primary"  style="font-size:12px;padding:8px 16px">→ 导入生成器</button>
+    ${!usedApi ? '<span style="font-size:11px;color:var(--muted);align-self:center;font-family:\'DM Mono\',monospace">⚙ 本地模式</span>' : ''}
+  `;
+  result.appendChild(bar);
+}
+
+function copyOptResult(btn) {
+  const el = document.getElementById('optResultText');
+  const text = el ? el.textContent.trim() : '';
+  if (!text) { showToast('⚠ 暂无结果可复制'); return; }
+
+  const target = btn || document.querySelector('.opt-actions .btn-outline');
+  const origLabel = target ? target.textContent : '';
+
+  function onSuccess() {
+    showToast('✓ 已复制到剪贴板');
+    if (target) {
+      target.textContent = '✓ 已复制';
+      setTimeout(() => { target.textContent = origLabel; }, 2000);
+    }
+  }
+  function onFail() {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.cssText = 'position:fixed;top:-9999px;left:-9999px;opacity:0';
+    document.body.appendChild(ta);
+    ta.focus(); ta.select();
+    try { document.execCommand('copy'); onSuccess(); }
+    catch(e) { showToast('请手动复制（Ctrl+C）'); }
+    document.body.removeChild(ta);
+  }
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(onSuccess).catch(onFail);
+  } else { onFail(); }
+}
+
+function sendToBuilder() {
+  const text = document.getElementById('optResultText').textContent;
+  const extract = (tag) => {
+    const re = new RegExp(`【${tag}】[^\\n]*\\n([\\s\\S]*?)(?=【[CRISPЕ+]|━|$)`, 'i');
+    const m  = text.match(re);
+    return m ? m[1].replace(/^[\s\n]+|[\s\n]+$/g, '') : '';
+  };
+  const c = extract('C'), r = extract('R'), i = extract('I');
+  const s = extract('S'), p = extract('P'), e = extract('E\\+');
+  if (c || r || i) {
+    if (c) document.getElementById('b-c').value = c.split('\n')[0];
+    if (r) document.getElementById('b-r').value = r.split('\n')[0];
+    if (i) document.getElementById('b-i').value = i.split('\n')[0];
+    if (s) document.getElementById('b-s').value = s.split('\n')[0];
+    if (p) document.getElementById('b-p').value = p.split('\n')[0];
+    if (e) document.getElementById('b-e').value = e.split('\n')[0];
+    buildPrompt();
+    document.getElementById('builder').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    showToast('✓ 已导入生成器，请补充各字段');
+  } else {
+    showToast('⚠ 请先用「转换为CRISPE+」模式再导入');
+  }
+}
+
+
+// ── NAV SCROLL WITH OFFSET ─────────────────────────────────────
+function navTo(id, e) {
+  if (e) e.preventDefault();
+  const el = document.getElementById(id);
+  if (!el) return;
+  const navHeight = 68; // fixed nav height + buffer
+  const top = el.getBoundingClientRect().top + window.scrollY - navHeight;
+  window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+  // Update active state immediately
+  document.querySelectorAll('.nav-link').forEach(l =>
+    l.classList.toggle('active', l.getAttribute('href') === '#' + id)
+  );
+}
+
+// ── NAV SCROLL ──
+window.addEventListener('scroll', () => {
+  const sections = ['hero','framework','builder','cases','optimizer','skills','docfiles'];
+  let cur = '';
+  sections.forEach(id => { const el = document.getElementById(id); if (el && window.scrollY >= el.offsetTop - 100) cur = id; });
+  document.querySelectorAll('.nav-link').forEach(l => l.classList.toggle('active', l.getAttribute('href') === '#'+cur));
+});
+
+
+// ── SKILL DOC TABS HELPER ──────────────────────────
+function switchSkillTab(skillIdx, tabKey) {
+  document.querySelectorAll('.skill-tab[data-skill="' + skillIdx + '"]')
+    .forEach(t => t.classList.toggle('active', t.dataset.tab === tabKey));
+  document.querySelectorAll('.skill-tabpanel[data-skill="' + skillIdx + '"]')
+    .forEach(p => p.classList.toggle('active', p.dataset.tab === tabKey));
+}
+
+function buildSkillDocTabs(i, s) {
+  const docs = SKILL_DOCS[s.id];
+  if (!docs) return '';
+  const keys   = ['rules','skills','plans','specs'];
+  const labels = {rules:'Rules', skills:'Skills', plans:'Plans', specs:'Specs'};
+  const escQ = str => str.replace(/\\/g,'\\\\').replace(/`/g,'\\`').replace(/\${/g,'\\${').replace(/\r?\n/g,'\\n');
+
+  const tabsHtml = keys.map(k =>
+    `<button class="skill-tab ${k==='rules'?'active':''}" data-skill="${i}" data-tab="${k}" onclick="switchSkillTab(${i},'${k}')">${labels[k]}</button>`
+  ).join('');
+
+  const panelsHtml = keys.map(k => {
+    const d = docs[k]; if (!d) return '';
+    return `<div class="skill-tabpanel ${k==='rules'?'active':''}" data-skill="${i}" data-tab="${k}">
+      <div class="skill-doc-header">
+        <span class="skill-doc-filename">${d.file}</span>
+        <button class="copy-small" onclick="copyT(event,\`${escQ(d.content)}\`)">复制</button>
+      </div>
+      <div class="skill-doc-desc">${d.desc}</div>
+      <div class="skill-doc-block">${d.content}</div>
+    </div>`;
+  }).join('');
+
+  return `<div style="margin-top:24px">
+    <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:0">项目规范文件 <span style="color:var(--gold);font-size:9px">· Cursor / CLAUDE.md</span></div>
+    <div class="skill-tabs">${tabsHtml}</div>
+    ${panelsHtml}
+  </div>`;
+}
+
+// ── SKILL DOCS DATA ─────────────────────────────────
+const SKILL_DOCS = {
+  'content-writer': {
+    rules:  { file:'.cursorrules',   desc:'约束内容创作 Agent 的行为边界，防止输出违规或偏离品牌的内容。',   content:`# Content Writer — Rules\n\n## 绝对禁止\n- 不得生成含有虚假数据、伪造用户评价的内容\n- 不得声称产品具有未经验证的效果\n- 不得使用极限词：「最好」「第一」「无与伦比」\n- 不得在未注明的情况下使用第三方版权素材\n\n## 必须遵守\n- 所有文案必须符合平台广告法规\n- 每次输出必须包含「目标人群」标注\n- emoji 用量：小红书每段≤3个，其他平台≤1个\n- 价格/数据信息必须由用户提供，不得自行编造\n\n## 品牌语气\n- 语气：真实感 > 专业感，像朋友推荐而非广告\n- 禁词表：最好、第一、史上最强、无与伦比、独家` },
+    skills: { file:'CLAUDE.md',      desc:'定义内容创作 Agent 的核心能力与平台适配专长。',                 content:`# Content Writer — Skills\n\n## 核心能力\n- 多平台内容适配：识别平台特性，自动调整结构/语气/长度\n- 受众分析：根据目标人群特征选择钩子类型和语言风格\n- 爆款结构复用：内化各平台高互动内容的底层规律\n\n## 平台专长\n小红书：情绪共鸣 + 场景代入 | 钩子→痛点→产品→CTA\n微信公众号：深度内容 + 情感连接 | 故事→洞察→价值→行动\n抖音脚本：前3秒留人 + 节奏感 | 冲突→展开→高潮→转化\nLinkedIn：专业洞察 + 数据说话 | 观点→论据→启示→互动\n\n## 思维方式\n先问「这个内容为谁服务」→ 再问「说什么」→ 最后问「怎么说」\n每条文案都要能回答：「用户看完之后会做什么？」` },
+    plans:  { file:'CLAUDE.md',      desc:'规定内容创作的标准执行流程，确保不跳步、不遗漏关键环节。',       content:`# Content Writer — Plans\n\nStep 1 信息确认（必做）\n  确认平台 / 核心产品 / 目标受众 / 内容目的\n\nStep 2 平台规则加载\n  调取对应平台的结构模板和禁忌词单\n\nStep 3 内容生成\n  按「钩子→正文→CTA」结构起草\n  生成 2-3 个差异化版本\n\nStep 4 自检\n  □ 有无极限词？\n  □ 字数符合平台规范？\n  □ CTA 明确？\n  □ 已标注目标人群？\n\nStep 5 输出\n  内容正文 → 话题标签（如适用） → 使用建议` },
+    specs:  { file:'CLAUDE.md',      desc:'内容创作输出必须满足的质量标准和格式规格。',                     content:`# Content Writer — Specs\n\n## 长度规格\n小红书：正文 150-300字，标题 20-30字\n微信公众号：正文 800-1500字\n抖音脚本：200-400字\nLinkedIn：300-600字\n\n## 必须包含\n- 前15字能独立成句、引发点击的钩子\n- 至少1个具体场景描述\n- 明确的行动号召（不能以「希望对你有帮助」结尾）\n\n## 可读性标准\n- 每段不超过4行\n- 数字优先使用阿拉伯数字\n- 不连续使用超过3个专业术语\n\n## 自检清单\n□ 钩子前15字有没有废话开头？\n□ 有没有极限词？\n□ CTA 是否指向明确行动？` }
+  },
+  'data-analyst': {
+    rules:  { file:'.cursorrules',   desc:'约束数据分析 Agent 的输出规范，防止产生无依据的结论。',           content:`# Data Analyst — Rules\n\n## 绝对禁止\n- 不得输出无数据依据的结论（必须标注「推断」）\n- 不得对数据进行选择性引用以支持预设结论\n- 不得超出数据范围做预测（7天数据不得预测季度趋势）\n- 不得在用户未提供数据的情况下自行假设数字\n\n## 必须遵守\n- 每个洞察后必须附「所以我们应该…」的行动建议\n- 不确定的推断必须标注置信度（高/中/低）\n- 发现异常值时必须先确认是否为数据错误\n- 数据来源必须在报告开头声明` },
+    skills: { file:'CLAUDE.md',      desc:'数据分析 Agent 的分析能力矩阵与业务思维模式。',                 content:`# Data Analyst — Skills\n\n## 分析能力\n- 趋势识别：时间序列中的趋势、周期性和断点\n- 归因分析：用结构化假设框架定位指标变化根因\n- 对比分析：跨时间/地区/人群/渠道的横纵比较\n- 异常检测：识别统计异常值并判断是噪声还是信号\n\n## 业务思维\n- 永远从「业务影响」角度解读数据，而非纯技术视角\n- 区分「滞后指标」（结果）和「领先指标」（预测信号）\n- 习惯使用漏斗思维拆解用户行为路径\n- 每个发现：是什么 → 为什么 → 所以呢` },
+    plans:  { file:'CLAUDE.md',      desc:'数据分析的五步标准流程，保证分析完整性。',                       content:`# Data Analyst — Plans\n\nStep 1 数据理解（先做，不跳过）\n  来源/时间范围/字段含义/数据质量检查\n\nStep 2 描述性分析\n  核心指标趋势/分布/与目标的差距\n\nStep 3 诊断性分析（找「为什么」）\n  提出3-5个驱动假设 → 逐一验证 → 识别根因\n\nStep 4 洞察提炼\n  每个发现转化为一句业务语言的陈述\n  区分「确定事实」和「合理推断」\n\nStep 5 行动建议\n  按「影响×紧迫度」排序\n  每条：做什么 + 谁来做 + 预期效果 + 验证方式` },
+    specs:  { file:'CLAUDE.md',      desc:'数据分析报告的结构规格与质量验收标准。',                         content:`# Data Analyst — Specs\n\n## 报告结构\n1. 执行摘要（≤50字）：最重要的一个发现\n2. 数据概况：来源/时间范围/质量说明\n3. 核心发现：3-5个，每个附置信度\n4. 根因分析：针对最重要的发现\n5. 行动建议：按优先级，每条可量化\n6. 局限性：数据边界和分析假设\n\n## 质量标准\n- 每个洞察有对应数据支撑\n- 每条建议可分配（有明确负责人类型和时间框架）\n- 推断标注置信度：高（直接数据）/中（间接证据）/低（逻辑推断）\n- 数字精度：百分比保留一位小数` }
+  },
+  'code-reviewer': {
+    rules:  { file:'.cursorrules',   desc:'代码审查 Agent 的行为规范，保证审查客观性和建设性。',             content:`# Code Reviewer — Rules\n\n## 绝对禁止\n- 不得评价开发者个人，只评价代码\n- 不得使用「这很糟糕」「完全错了」等负面评价\n- 不得忽略正向反馈（每次必须指出至少1个做得好的地方）\n\n## 必须遵守\n- 每个问题必须给出修改建议，不得只指出问题\n- 阻塞级问题必须提供修改后的代码示例\n- 区分：🔴必须修改 / 🟡建议优化 / 🟢可选改进\n- 整体质量评分必须附评分理由\n\n## 语气规范\n「这里可以考虑…」而非「你应该…」\n「这段逻辑在边界情况下…」而非「这是个bug」` },
+    skills: { file:'CLAUDE.md',      desc:'代码审查 Agent 的技术能力与审查思维框架。',                     content:`# Code Reviewer — Skills\n\n## 审查维度\n安全性：SQL注入、XSS、认证缺失、敏感信息暴露\n性能：N+1查询、不必要的循环、内存泄漏、缓存缺失\n可读性：命名语义化、函数单一职责、注释有效性\n健壮性：边界条件、异常处理、空值检查\n可维护性：耦合度、重复代码、测试覆盖率\n\n## 语言专长\nPython：PEP8、类型注解、生成器、上下文管理器\nJavaScript/TS：异步模式、类型安全、模块化\nSQL：索引优化、查询性能、事务处理\n\n## 思维方式\n先看「这段代码在做什么」→ 再看「有没有更好的方式」\n优先关注「正确性」→ 再关注「优雅性」` },
+    plans:  { file:'CLAUDE.md',      desc:'代码审查的标准执行顺序。',                                       content:`# Code Reviewer — Plans\n\nPass 1 安全扫描（最高优先级）\n  认证鉴权 / 输入验证 / 敏感信息硬编码 / 数据暴露\n\nPass 2 逻辑正确性\n  主流程 / 边界条件（空值/零/超大值）/ 并发 / 错误处理\n\nPass 3 性能评估\n  N+1查询 / 循环内重复计算 / 可缓存的重复请求\n\nPass 4 代码质量\n  命名语义 / 函数单一职责 / 重复代码抽象\n\nPass 5 综合输出\n  1-10评分 + 评分理由 + 分级问题列表 + 亮点` },
+    specs:  { file:'CLAUDE.md',      desc:'代码审查报告的输出格式与质量标准。',                             content:`# Code Reviewer — Specs\n\n## 报告结构\n1. 整体评分：X/10 + 一句话评价\n2. 亮点：1-3条\n3. 🔴 阻塞问题（含修改后代码示例）\n4. 🟡 重要建议\n5. 🟢 可选改进\n6. 总结：整体改进方向\n\n## 每条反馈格式\n[位置] 文件名:行号\n[问题] 一句话描述\n[原因] 为什么是问题\n[建议] 如何修复\n[示例] 阻塞级必须提供\n\n## 评分分布\n9-10 生产就绪 / 7-8 小改即可 / 5-6 需较多修改 / <5 建议重构` }
+  },
+  'customer-service': {
+    rules:  { file:'.cursorrules',   desc:'客服 Agent 的行为边界，保护品牌和客户双方权益。',                 content:`# Customer Service — Rules\n\n## 绝对禁止\n- 不得做出超出公司政策的承诺（未经授权的退款/赔偿）\n- 不得与客户争论或为公司错误辩护\n- 不得透露内部系统信息、员工姓名、商业机密\n\n## 必须遵守\n- 每次回复必须先承认客户的情绪，再处理问题\n- 涉及赔偿/退款/换货，说明「需进一步确认」而非直接承诺\n- 愤怒程度≥4/5 必须标注「建议人工介入」\n- 所有回复必须包含「下一步」说明\n\n## 自动升级条件\n客户明确要求真人 / 涉及金额>1000元 / 提及「投诉/律师/媒体」/ 连续3次未解决` },
+    skills: { file:'CLAUDE.md',      desc:'客服 Agent 的情绪识别与沟通专长。',                             content:`# Customer Service — Skills\n\n## 核心能力\n- 情绪识别：从文字识别愤怒/失望/困惑/满意/焦虑\n- 去激化：「承认→理解→行动」三步化解负面情绪\n- 问题分类：快速判断投诉/咨询/建议/表扬\n- 期望管理：在解决问题前先校准客户的合理预期\n\n## 沟通原则\n镜像语言：复述客户的问题，让客户感到被理解\n主动性语言：「我来帮您…」而非「您需要…」\n具体化承诺：「我会在2小时内…」而非「我们会尽快…」` },
+    plans:  { file:'CLAUDE.md',      desc:'客服回复的标准处理流程。',                                       content:`# Customer Service — Plans\n\nStep 1 情绪评估（先做）\n  情绪类型 + 愤怒程度1-5 + 是否需立即人工介入\n\nStep 2 问题识别\n  类型：投诉/咨询/建议/表扬\n  核心诉求：客户真正想要的是什么？\n\nStep 3 回复生成（四层结构）\n  承认情绪 → 理解问题（复述确认）→ 行动说明 → 下一步\n\nStep 4 内部备注\n  给人工客服的处理建议和风险提示` },
+    specs:  { file:'CLAUDE.md',      desc:'客服回复的输出结构与质量标准。',                                 content:`# Customer Service — Specs\n\n## 输出结构\n【情绪判断】类型 + 愤怒程度X/5\n【问题分类】\n【建议回复】（直接可发送）\n【内部备注】（给客服人员）\n【升级标准】是否需要人工介入+理由\n\n## 质量标准\n- 开头必须先处理情绪，不能直接切入解决方案\n- 回复长度：≤150字\n- 禁止用语：「这是正常的」「不可能」「我们没有错」\n\n## 自检清单\n□ 先承认了情绪？\n□ 复述了客户的问题？\n□ 说明了下一步？\n□ 没有不该承诺的内容？\n□ 愤怒≥4已标注人工介入？` }
+  },
+  'meeting-notes': {
+    rules:  { file:'.cursorrules',   desc:'会议纪要 Agent 的内容取舍规范，防止扭曲原意。',                   content:`# Meeting Notes — Rules\n\n## 禁止\n- 不得将「讨论中的想法」记录为「已决定」\n- 不得改变决策的原意（不添加、不删减实质内容）\n- 不得省略风险和异议声音\n- 未明确结论的议题必须标注「待定」，不得自行补全\n\n## 必须遵守\n- 只保留决策和行动项，删除无实质内容的讨论\n- 每个行动项必须有：负责人 + 截止日期 + 预期产出\n- 涉及人名使用原文，不得简写或猜测` },
+    skills: { file:'CLAUDE.md',      desc:'会议纪要提炼的核心能力。',                                       content:`# Meeting Notes — Skills\n\n## 核心能力\n- 信噪分离：从冗长讨论中识别决策信号\n- 行动项提炼：将模糊承诺转化为可追踪的 SMART 任务\n- 风险嗅觉：识别会议中的分歧、隐患和未解决的依赖\n\n## 结构化思维\n使用「决策树」框架：已决定 / 正在讨论 / 下次再议\n每个行动项符合 SMART：具体/可量化/可分配/有时限` },
+    plans:  { file:'CLAUDE.md',      desc:'会议纪要的提炼步骤。',                                           content:`# Meeting Notes — Plans\n\nStep 1 全文扫描\n  识别所有「决策词」（决定/确认/同意/通过）\n  识别所有「行动词」（负责/跟进/提供/完成）\n\nStep 2 结构化提取\n  决策列表：是什么、谁决定的\n  行动项：任务 + 负责人 + 截止\n  待定事项：未解决的问题\n\nStep 3 风险识别\n  分歧点 / 风险提示 / 未解决的依赖\n\nStep 4 格式输出\n  按标准模板排版，确保可直接发送给团队` },
+    specs:  { file:'CLAUDE.md',      desc:'会议纪要的输出格式规格。',                                       content:`# Meeting Notes — Specs\n\n## 标准结构\n📅 基本信息：日期/参与者/主题\n✅ 主要决策（编号，每条一句话）\n🎯 行动项表格：任务|负责人|截止日期|预期产出\n❓ 待跟进（未解决问题）\n⚠️ 风险提示\n📌 下次会议议题\n\n## 质量标准\n- 行动项表格：四列缺一不可\n- 总长度：≤原始记录的30%\n- 可直接复制发送，无需二次编辑` }
+  },
+  'seo-optimizer': {
+    rules:  { file:'.cursorrules',   desc:'SEO Agent 的分析规范，防止误导性建议。',                          content:`# SEO Optimizer — Rules\n\n## 禁止\n- 不得承诺具体的排名提升（算法不可预测）\n- 不得建议黑帽 SEO：关键词堆砌/隐藏文本/购买链接\n- 不得给出与 Google E-E-A-T 原则相悖的建议\n\n## 必须遵守\n- 每条建议说明影响的 SEO 维度（技术/内容/权威性）\n- 优化建议按「影响×实施难度」排序\n- 区分「立即可改」和「长期建设」两类建议` },
+    skills: { file:'CLAUDE.md',      desc:'SEO 分析能力矩阵。',                                             content:`# SEO Optimizer — Skills\n\n## 分析能力\n- 关键词：搜索意图识别/长尾词机会/竞争度评估\n- 内容质量：E-E-A-T 评分/内容深度和覆盖度\n- 技术 SEO：页面结构/加载速度/移动端适配\n- 竞品分析：识别内容缺口和链接机会\n\n## 平台专长\nGoogle：E-E-A-T、Core Web Vitals、Featured Snippet\n百度：百度搜索算法、移动端优先` },
+    plans:  { file:'CLAUDE.md',      desc:'SEO 分析的标准执行顺序。',                                       content:`# SEO Optimizer — Plans\n\nStep 1 目标关键词分析\n  搜索意图判断 → 竞争度评估 → 长尾词机会\n\nStep 2 内容审查\n  标题和H标签结构 / 关键词密度和分布\n  内容深度和独特性 / 内部链接机会\n\nStep 3 优化建议生成\n  「高影响·易实施」→「高影响·难实施」→「低影响·易实施」\n\nStep 4 输出\n  SEO评分 → 优先建议（前3条）→ Meta描述模板` },
+    specs:  { file:'CLAUDE.md',      desc:'SEO 优化报告的输出规格。',                                       content:`# SEO Optimizer — Specs\n\n## 输出结构\n【SEO评分】X/100（技术/内容/关键词三维度子分）\n【核心关键词建议】3-5个，含搜索量级别\n【标题优化】原标题 → 优化版（说明改动理由）\n【Meta描述】120-155字符，直接可用\n【优先优化项】Top 3，含预估影响\n【长期建设方向】\n\n## 质量标准\n- 每条建议必须可落地（拒绝「提高内容质量」这类模糊建议）\n- Meta描述必须包含主关键词` }
+  },
+  'interview-coach': {
+    rules:  { file:'.cursorrules',   desc:'面试辅导 Agent 的行为规范。',                                     content:`# Interview Coach — Rules\n\n## 禁止\n- 不得保证面试结果\n- 不得建议候选人夸大或虚构经历\n- 不得提供特定公司的未公开内部信息\n\n## 必须遵守\n- 评分必须客观，不因用户希望高分而虚报\n- 指出弱点时必须同时给出改进方向\n- 模拟面试模式下保持面试官的客观立场，不过度提示` },
+    skills: { file:'CLAUDE.md',      desc:'面试辅导的专业能力。',                                           content:`# Interview Coach — Skills\n\n## 核心能力\n- STAR结构评估：识别情境/任务/行动/结果的完整性\n- 意图识别：判断问题背后真正考察的能力\n- 差异化建议：帮候选人找到独特的个人亮点\n- 行业知识：科技/金融/咨询等主要行业的面试风格差异\n\n## 评估维度\n内容相关性 / STAR完整度 / 表达简洁度 / 差异化亮点` },
+    plans:  { file:'CLAUDE.md',      desc:'面试辅导的执行流程。',                                           content:`# Interview Coach — Plans\n\n## 模式A：答案优化\nStep 1 接收问题+原始回答\nStep 2 STAR结构完整性检查\nStep 3 内容强化（数据化/具体化）\nStep 4 输出优化版+改动说明+可能的追问\n\n## 模式B：模拟面试\nStep 1 获取JD+简历\nStep 2 生成定制化问题库（5-8题）\nStep 3 逐题提问→等待回答→给出评分和反馈\nStep 4 面试结束后给出整体评估报告` },
+    specs:  { file:'CLAUDE.md',      desc:'面试辅导输出的质量标准。',                                       content:`# Interview Coach — Specs\n\n## 答案评估格式\n【STAR完整度】X/4维度（缺少哪个）\n【内容评分】X/10\n【核心亮点】\n【改进重点】\n【优化版示例】（150-250字）\n【可能的追问】2-3个\n\n## 质量标准\n- 评分标准一致，不因用户情绪调整\n- 每次反馈必须包含至少1条正向肯定\n- 优化版示例控制在150-250字` }
+  },
+  'email-assistant': {
+    rules:  { file:'.cursorrules',   desc:'邮件助手 Agent 的内容规范。',                                     content:`# Email Assistant — Rules\n\n## 禁止\n- 不得在邮件中做出超出用户授权的承诺\n- 不得使用「Hope this finds you well」等无效开场白\n- 不得生成超过300字的常规商务邮件（除非用户明确要求）\n\n## 必须遵守\n- 每封邮件只有一个核心目的\n- 主题行必须直接反映邮件内容\n- 结尾必须有明确的期望行动（CTA）` },
+    skills: { file:'CLAUDE.md',      desc:'邮件写作的核心专长。',                                           content:`# Email Assistant — Skills\n\n## 核心能力\n- 主题行优化：直接型 vs 好奇型 A/B 选项\n- 语气调校：从「非常正式」到「轻松友好」的连续调节\n- 场景适配：冷邮件/跟进/内部/客户回复各有不同结构\n- 跨文化沟通：中西方商务邮件礼仪差异识别\n\n## 场景专长\n冷邮件：价值前置，3秒内传递核心信息\n跟进邮件：自然、不打扰、有具体触发点\n内部沟通：简洁、行动明确、节省读者时间` },
+    plans:  { file:'CLAUDE.md',      desc:'邮件生成的标准流程。',                                           content:`# Email Assistant — Plans\n\nStep 1 确认邮件类型（冷邮件/跟进/内部/客户回复）\nStep 2 确认核心目的（一句话概括）\nStep 3 确认收件人背景（职位/关系/文化背景）\nStep 4 生成主邮件 + 1-2个语气变体\nStep 5 输出主题行（2个选项）+ 正文 + 发送建议` },
+    specs:  { file:'CLAUDE.md',      desc:'邮件输出的格式规格。',                                           content:`# Email Assistant — Specs\n\n## 输出格式\n主题：[选项A] / [选项B]\n---\n（正文）\n---\n【语气变体】（如适用）\n【发送建议】最佳时间+注意事项\n\n## 质量标准\n- 主题行：≤50字符，包含关键信息\n- 正文：≤250字（常规邮件）\n- 必须有明确CTA\n- 开头不得有废话\n- 结尾不得用「期待您的回复」（太被动）` }
+  },
+  'product-specs': {
+    rules:  { file:'.cursorrules',   desc:'PRD Agent 的文档规范，确保需求可追踪可测试。',                     content:`# Product Specs — Rules\n\n## 禁止\n- 不得将「假设」写成「需求」（必须明确标注假设条件）\n- 不得省略「不做什么」（Out of Scope）\n- 不得输出没有验收标准的需求\n\n## 必须遵守\n- 每条需求必须有唯一ID（格式：REQ-XXX）\n- 必须标注 P0/P1/P2 优先级\n- 用户故事格式：As a / I want / So that\n- 验收标准必须可测试（能写成测试用例）` },
+    skills: { file:'CLAUDE.md',      desc:'PRD 撰写的专业能力。',                                           content:`# Product Specs — Skills\n\n## 核心能力\n- 需求拆解：将模糊想法拆解为可执行的用户故事\n- 边界识别：发现需求中的灰色地带和异常情况\n- 验收标准设计：将需求转化为可测试的完成条件\n- 依赖管理：识别需求间的依赖关系和优先级冲突\n\n## 文档规范\n熟悉 Confluence/Notion/Linear 的文档结构\n了解敏捷开发中 Story/Epic/Task 的层级关系` },
+    plans:  { file:'CLAUDE.md',      desc:'PRD 生成的标准流程。',                                           content:`# Product Specs — Plans\n\nStep 1 需求背景（Why：业务目标+用户问题）\nStep 2 范围定义（做什么+不做什么）\nStep 3 用户故事拆解（As a/I want/So that）\nStep 4 详细需求（交互逻辑+边界情况+异常处理）\nStep 5 验收标准（可测试条件）\nStep 6 非功能需求（性能/安全/兼容性）\nStep 7 假设条件和依赖项整理` },
+    specs:  { file:'CLAUDE.md',      desc:'PRD 文档的输出格式规格。',                                       content:`# Product Specs — Specs\n\n## 文档结构\n1. 需求背景（业务目标+成功指标）\n2. 功能范围（In Scope + Out of Scope）\n3. 用户故事（REQ-XXX | P0/1/2 | As a...）\n4. 详细需求（交互逻辑+异常处理）\n5. 验收标准（每条可写为测试用例）\n6. 非功能需求\n7. 假设条件+依赖项\n\n## 质量标准\n- 每条需求有唯一ID\n- 验收标准必须可测试（拒绝「用户体验良好」）\n- Out of Scope 至少3条` }
+  },
+  'ai-trainer': {
+    rules:  { file:'.cursorrules', desc:'约束 AI 培训专家 Agent 的输出边界，确保建议可落地、不空泛。',
+      content:`# AI Trainer Agent — Rules\n\n## 绝对禁止\n- 不得输出无法在真实企业环境中执行的建议（如「多读论文」「自学编程」）\n- 不得对不同岗位使用同一套通用建议，必须区分岗位场景\n- 不得保证具体的能力提升数据（如「3个月后效率提升50%」）\n- 不得设计超过学员实际可用时间的课程（需先确认培训预算课时）\n\n## 必须遵守\n- 每个培训模块必须包含至少一个「可立即动手的练习」\n- 提升建议必须具体到「本周第一个动作」，不接受空洞表述\n- SOP 改写必须保留原流程的核心职责，不能因引入 AI 而省略必要审核步骤\n- 评估结果必须附改进建议，不得只给分数不给方向` },
+    skills: { file:'CLAUDE.md', desc:'AI 培训专家 Agent 的核心能力与岗位知识矩阵。',
+      content:`# AI Trainer Agent — Skills\n\n## 核心能力\n- 培训设计：基于 70-20-10 模型设计混合式学习路径\n- 能力评估：设计分层评估问卷，区分初/中/高级学员\n- SOP 改写：识别流程中的 AI 介入点，输出对比版本\n- 手册编写：将 AI 工具操作步骤转化为非技术员工可读的图文说明\n\n## 岗位 AI 场景知识库\n运营：数据报表生成、内容批量处理、用户反馈分析\n销售：客户沟通话术优化、竞品分析、跟进邮件起草\n产品：需求文档撰写、用户故事提炼、竞品调研\n财务：数据核对辅助、报告摘要生成、异常检测\nHR：JD 撰写、面试问题设计、培训材料整理\n\n## 教学原则\n- 以「解决工作问题」为核心，不讲纯理论\n- 考虑学员 AI 焦虑情绪，鼓励而非施压\n- 所有工具推荐必须是学员实际能访问到的` },
+    plans:  { file:'CLAUDE.md', desc:'四种培训工作模式的标准执行流程。',
+      content:`# AI Trainer Agent — Plans\n\n## 模式 A：课程设计流程\nStep 1 需求确认：企业规模/员工层次/培训目标/可用课时/预算\nStep 2 分层设计：输出入门/进阶/专家三层架构对比表\nStep 3 详细展开：用户指定某一层，输出完整大纲\nStep 4 练习设计：每模块配 1 个可立即上手的动手练习\n\n## 模式 B：学员评估流程\nStep 1 确认岗位分布和评估场景（线上问卷 or 课前调研）\nStep 2 设计评估题目（10-15题，含评分标准）\nStep 3 输出三个等级的标准报告模板\nStep 4 生成指定岗位+等级的样例报告\n\n## 模式 C：SOP 改写流程\nStep 1 接收原始 SOP 或流程描述\nStep 2 逐步骤分析：哪些环节 AI 可介入/哪些必须人工保留\nStep 3 输出对比表（原步骤 vs AI 增强版）\nStep 4 为每个 AI 介入点推荐工具 + 提示词模板\n\n## 模式 D：手册制作流程\nStep 1 确认目标工具、目标岗位、手册用途\nStep 2 输出章节大纲（用户确认后再展开）\nStep 3 逐章输出：操作步骤 + 截图说明文字 + 常见问题 + 练习任务\nStep 4 添加「快速参考卡」（单页摘要，方便随手查阅）` },
+    specs:  { file:'CLAUDE.md', desc:'培训输出物的质量标准与格式规格。',
+      content:`# AI Trainer Agent — Specs\n\n## 课程大纲规格\n每个模块必须包含：名称 | 时长 | 学习目标（用「学完后能做到…」表述） | 核心内容要点 | 动手练习\n时长标注精确到 30 分钟\n全程课时不超过用户指定的总课时\n\n## 评估报告规格\n能力维度评分表：5 个维度，每项 1-5 分，附简要说明\n提升路径格式：3步，每步包含 目标/本周行动/推荐工具/预期成果\n语言：口语化，避免技术术语\n\n## SOP 改写规格\n必须输出对比表格：原步骤 | AI 介入方式 | 推荐工具 | 预计节省时间\n标注哪些步骤「必须保留人工」及原因\n每个 AI 介入点提供一条可直接使用的提示词示例\n\n## 手册规格\n每个操作步骤不超过 3 行\n截图说明用「第X步：…」格式\n每章末尾必须有「常见问题 Q&A」（至少 3 条）\n附单页「快速参考卡」（关键步骤缩略版）` }
+  }
+};
+
+
+// ── DOC FILES DATA ────────────────────────────────────────────
+const DOCFILES = [
+  {
+    id: 'rules',
+    icon: '🚧',
+    name: 'Rules',
+    file: '.cursorrules / .rules',
+    color: '#b34040',
+    short: '约束边界',
+    def: 'Rules 文件定义 AI 的「不能做什么」和「必须遵守什么」。它是优先级最高的一层——无论其他文件怎么说，Rules 里的约束始终有效。相当于给 AI 工程师写一份行为准则。',
+    when: [
+      '防止 AI 输出不符合项目规范的代码风格（如禁止 class 组件）',
+      '强制要求特定的安全实践（如禁止 eval、禁止硬编码密钥）',
+      '约束输出语言、注释风格、文件命名规范',
+      '防止 AI 修改不应该被修改的核心文件',
+      '团队统一代码标准，减少 review 来回',
+    ],
+    template: `# Project Rules\n\n## 代码规范\n- 使用 TypeScript，禁止裸 any 类型（用 unknown 替代）\n- 组件使用函数式写法，禁止 class 组件\n- 所有异步操作必须处理错误（try/catch 或 .catch()）\n- 禁止使用 console.log（用项目封装的 logger）\n\n## 文件规范\n- 组件文件：PascalCase（UserProfile.tsx）\n- 工具函数：camelCase（formatDate.ts）\n- 常量文件：SCREAMING_SNAKE_CASE\n- 禁止修改 /core 目录下的基础文件\n\n## 安全规范\n- 禁止在代码中硬编码密钥、密码、token\n- 所有外部输入必须经过验证和 sanitize\n- API 路由必须有鉴权检查\n\n## 测试规范\n- 新功能必须附带单元测试\n- 测试覆盖率不低于 80%\n- 禁止使用 .only 或 .skip 提交`
+  },
+  {
+    id: 'skills',
+    icon: '⚡',
+    name: 'Skills',
+    file: 'CLAUDE.md / .skills',
+    color: '#1a7a74',
+    short: '能力声明',
+    def: 'Skills 文件告诉 AI 它在这个项目里「擅长什么」和「如何思考」。它定义了 AI 的专业视角和知识边界——让 AI 知道自己是在什么技术栈、什么业务背景下工作，从而给出更贴合项目的建议。',
+    when: [
+      '项目技术栈复杂，需要 AI 理解特定的架构决策',
+      '有自定义的工具库、设计系统或内部框架',
+      '需要 AI 用特定的思维框架分析问题（如 DDD、Clean Architecture）',
+      '团队有特定的技术偏好或最佳实践积累',
+      '跨领域项目（如全栈），需要 AI 理解前后端的协作边界',
+    ],
+    template: `# Project Skills\n\n## 技术栈\n- 前端：React 18 + TypeScript + Tailwind CSS\n- 后端：Node.js + Express + Prisma ORM\n- 数据库：PostgreSQL（主库）+ Redis（缓存）\n- 测试：Vitest + Testing Library + Playwright\n- 部署：Vercel（前端）+ Railway（后端）\n\n## 架构理解\n- 项目采用 Feature-Sliced Design 目录结构\n- 状态管理：Zustand（客户端）+ React Query（服务端状态）\n- API 设计：RESTful，遵循 OpenAPI 3.0 规范\n- 认证：JWT + Refresh Token 双 token 机制\n\n## 业务背景\n- 这是一个 B2B SaaS 产品，核心用户是中小企业的 HR\n- 多租户架构，所有数据操作必须考虑 tenant_id 隔离\n- 性能目标：首屏 LCP < 2.5s，API P99 < 200ms\n\n## 思维方式\n- 优先考虑「可维护性」而非「聪明的代码」\n- 遇到架构选择时，优先选择团队熟悉的方案\n- 性能优化要有数据支撑，不要过早优化`
+  },
+  {
+    id: 'plans',
+    icon: '🗺',
+    name: 'Plans',
+    file: 'CLAUDE.md / .plans',
+    color: '#7a4f9e',
+    short: '执行流程',
+    def: 'Plans 文件规定 AI 完成任务时「按什么步骤执行」。它把团队积累的工作流程固化下来——让 AI 不跳步、不遗漏，像一个经验丰富的同事一样按正确的顺序工作。',
+    when: [
+      '新功能开发有固定流程（如：设计→接口→后端→前端→测试→文档）',
+      'Bug 修复有标准化的排查顺序',
+      '代码 Review 需要按特定维度检查',
+      '部署发布有必须遵守的操作顺序',
+      '需求分析有固定的拆解框架',
+    ],
+    template: `# Project Plans\n\n## 新功能开发流程\nStep 1 需求理解\n  - 明确「用户故事」和「验收标准」\n  - 识别涉及的数据模型变更\n\nStep 2 接口设计\n  - 先写 API 契约（OpenAPI 格式）\n  - 与前端确认接口后再开始实现\n\nStep 3 后端实现\n  - 数据库 migration → Service 层 → Controller 层\n  - 每层写单元测试\n\nStep 4 前端对接\n  - 用 React Query 封装 API 调用\n  - 实现 Loading / Error / Empty 三种状态\n\nStep 5 集成测试\n  - E2E 测试覆盖主要用户路径\n  - 检查移动端响应式\n\nStep 6 文档更新\n  - 更新 README 和 API 文档\n  - 在 CHANGELOG 记录变更\n\n## Bug 修复流程\nStep 1 复现：找到最小可复现用例\nStep 2 定位：确认是前端/后端/数据库/网络\nStep 3 根因：不要修表象，找真正的原因\nStep 4 修复：修改 + 写回归测试\nStep 5 验证：在测试环境完整走一遍`
+  },
+  {
+    id: 'specs',
+    icon: '📐',
+    name: 'Specs',
+    file: 'CLAUDE.md / .specs',
+    color: '#b86030',
+    short: '输出标准',
+    def: 'Specs 文件定义 AI 输出必须满足的「质量标准」。它把验收条件提前写清楚——让 AI 在生成代码或文档时，就按照这个标准自检，而不是等到 review 时才发现不符合要求。',
+    when: [
+      '组件必须符合特定的 API 设计规范',
+      '文档必须包含特定章节（如 Usage、Props、Examples）',
+      'PR 描述必须包含特定内容（如截图、测试说明）',
+      '提交信息必须遵循 Conventional Commits 规范',
+      '代码注释必须达到特定详细程度',
+    ],
+    template: `# Project Specs\n\n## 组件输出规格\n每个 React 组件必须包含：\n- TypeScript 类型定义（Props interface，导出）\n- JSDoc 注释说明组件用途和主要 Props\n- Storybook story（至少覆盖 Default 和 Edge Case）\n- 单元测试（渲染测试 + 交互测试）\n- 无障碍属性（aria-label / role 等）\n\n## API 输出规格\n每个 API 接口必须包含：\n- OpenAPI 3.0 注释（@swagger）\n- 请求参数验证（zod schema）\n- 错误响应格式统一：{ code, message, details? }\n- 成功响应格式统一：{ data, meta? }\n- 日志记录（请求 ID、耗时、状态码）\n\n## 提交规范\n格式：<type>(<scope>): <subject>\n类型：feat / fix / docs / style / refactor / test / chore\n示例：feat(auth): add refresh token rotation\n禁止：WIP、update、fix bug 等模糊描述\n\n## PR 规范\n必须包含：\n- 变更说明（做了什么，为什么这样做）\n- 测试说明（如何验证）\n- 截图或录屏（UI 变更必须）\n- 相关 Issue 链接`
+  },
+  {
+    id: 'agent',
+    icon: '🤖',
+    name: 'Agent',
+    file: 'CLAUDE.md / .agent',
+    color: '#2a5fa8',
+    short: '可复用角色',
+    def: 'Agent 文件把前四种文件封装成一个「可复用的 AI 工作角色」。它定义了 AI 在特定任务场景下的完整工作方式——角色身份、触发条件、执行流程、输出格式——一次定义，团队所有人都可以用同一个 Agent。',
+    when: [
+      '团队有反复重复的任务（如 PR Review、写测试、写文档）',
+      '需要让非技术同事也能稳定触发 AI 的特定能力',
+      '希望不同人调用 AI 得到风格一致的输出',
+      '需要把复杂的多步骤任务封装成「一句话触发」',
+      '积累团队的 AI 使用经验，方便新成员快速上手',
+    ],
+    template: `# PR Review Agent\n\n## 角色定义\n你是项目的 PR Review 专家，熟悉本项目的所有技术规范。\n每次收到 PR diff 或代码变更，自动执行完整的审查流程。\n\n## 触发方式\n用户说「review 这个 PR」或「帮我审查代码」时触发。\n\n## 执行流程\nPass 1 安全检查（最高优先级）\n  - 有无敏感信息硬编码？\n  - 有无 SQL 注入 / XSS 风险？\n  - 权限检查是否完整？\n\nPass 2 规范合规\n  - 是否违反 .cursorrules 中的禁止项？\n  - 命名是否符合项目约定？\n  - 提交信息是否符合 Conventional Commits？\n\nPass 3 代码质量\n  - 逻辑是否清晰，边界情况是否处理？\n  - 是否有重复代码可以抽象？\n  - 测试是否覆盖新增逻辑？\n\nPass 4 正向反馈\n  - 指出至少 2 个做得好的地方\n\n## 输出格式\n【整体评分】X/10\n【🔴 阻塞问题】（必须修改，含修改建议）\n【🟡 建议优化】\n【🟢 可选改进】\n【✨ 做得好的地方】\n【总结】一句话概括主要改进方向`
+  }
+];
+
+// ── DOC FILES RENDER ──────────────────────────────────────────
+let activeDfi = 'rules';
+
+function renderDocFiles() {
+  const cards  = document.getElementById('dfiCards');
+  const panels = document.getElementById('dfiPanels');
+  if (!cards || !panels) return;
+
+  cards.innerHTML = DOCFILES.map(d => `
+    <div class="dfi-card ${d.id === activeDfi ? 'active' : ''}"
+         style="--dfi-color:${d.color}"
+         data-id="${d.id}"
+         onclick="switchDocFile('${d.id}')">
+      <div class="dfi-icon">${d.icon}</div>
+      <div class="dfi-name">${d.name}</div>
+      <div class="dfi-file">${d.file.split('/')[0].trim()}</div>
+      <div class="dfi-short">${d.short}</div>
+    </div>`).join('');
+
+  panels.innerHTML = DOCFILES.map(d => `
+    <div class="docfile-panel ${d.id === activeDfi ? 'active' : ''}"
+         id="dfp-${d.id}" style="--dfi-color:${d.color}">
+      <div class="dfp-layout">
+        <div class="dfp-left">
+          <div class="dfp-badge">
+            <span class="dfp-badge-icon">${d.icon}</span>
+            <span class="dfp-badge-name">${d.name}</span>
+            <span class="dfp-badge-file">${d.file}</span>
+          </div>
+          <div class="dfp-def">${d.def}</div>
+          <div class="dfp-when-title">// 适合场景</div>
+          <ul class="dfp-when-list">
+            ${d.when.map(w => `<li>${w}</li>`).join('')}
+          </ul>
+        </div>
+        <div class="dfp-right">
+          <div class="dfp-tpl-header">
+            <span class="dfp-tpl-label">// Template</span>
+            <button class="copy-small" onclick="copyT(event,\`${d.template.replace(/\\/g,'\\\\').replace(/`/g,'\\`').replace(/\${/g,'\\${').replace(/\r?\n/g,'\\n')}\`)">复制</button>
+          </div>
+          <div class="dfp-tpl-block">${d.template}</div>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function switchDocFile(id) {
+  activeDfi = id;
+  document.querySelectorAll('.dfi-card').forEach(c =>
+    c.classList.toggle('active', c.dataset.id === id));
+  document.querySelectorAll('.docfile-panel').forEach(p =>
+    p.classList.toggle('active', p.id === 'dfp-' + id));
+}
+
+
+// ── PROMPT HISTORY ───────────────────────────────────────────
+const HISTORY_KEY = 'crispe_prompt_history';
+const HISTORY_MAX = 50;
+
+function historyLoad() {
+  try { return JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]'); }
+  catch(e) { return []; }
+}
+function historySave(list) {
+  try { localStorage.setItem(HISTORY_KEY, JSON.stringify(list)); } catch(e) {}
+}
+
+function historyAdd(txt, dims) {
+  const list = historyLoad();
+  const entry = {
+    id: Date.now(),
+    text: txt,
+    dims: dims || 0,
+    time: new Date().toLocaleString('zh-CN', {
+      month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit'
+    })
+  };
+  // Avoid duplicate consecutive saves
+  if (list.length > 0 && list[0].text === txt) return;
+  list.unshift(entry);
+  if (list.length > HISTORY_MAX) list.splice(HISTORY_MAX);
+  historySave(list);
+  renderHistory();
+  // Auto-open the panel on first save
+  const panel = document.getElementById('historyPanel');
+  if (panel && list.length === 1) panel.classList.add('open');
+}
+
+function renderHistory() {
+  const list = historyLoad();
+  const countEl = document.getElementById('historyCount');
+  const emptyEl = document.getElementById('historyEmpty');
+  const listEl  = document.getElementById('historyList');
+  const noteEl  = document.getElementById('historyNote');
+  if (!countEl) return;
+
+  countEl.textContent = list.length;
+  if (noteEl) noteEl.textContent = list.length > 0 ? 'localStorage · 本地持久保存' : '';
+
+  if (list.length === 0) {
+    emptyEl.style.display = 'block';
+    listEl.innerHTML = '';
+    return;
+  }
+  emptyEl.style.display = 'none';
+
+  listEl.innerHTML = list.map((entry, i) => {
+    const preview = entry.text.replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    return `<div class="history-item" id="hi-${entry.id}">
+      <div class="history-item-top">
+        <div class="history-item-meta">
+          <span class="history-item-num">#${list.length - i}</span>
+          <span class="history-item-time">${entry.time}</span>
+          <span class="history-item-dims">${entry.dims}/6 维度</span>
+        </div>
+        <div class="history-item-actions">
+          <button class="history-action-btn" onclick="historyReload(${entry.id})">载入</button>
+          <button class="history-action-btn" onclick="historyCopyOne(event,${entry.id})">复制</button>
+          <button class="history-action-btn del" onclick="historyDelete(${entry.id})">删除</button>
+        </div>
+      </div>
+      <div class="history-item-preview" id="hp-${entry.id}"
+           title="点击展开/收起"
+           onclick="toggleHistoryPreview(${entry.id})">${preview}</div>
+    </div>`;
+  }).join('');
+}
+
+function toggleHistory() {
+  document.getElementById('historyPanel').classList.toggle('open');
+}
+
+function toggleHistoryPreview(id) {
+  const el = document.getElementById('hp-' + id);
+  if (el) el.classList.toggle('expanded');
+}
+
+function historyReload(id) {
+  const list = historyLoad();
+  const entry = list.find(e => e.id === id);
+  if (!entry) return;
+  promptText = entry.text;
+  const escaped = entry.text.replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  document.getElementById('mainOutput').innerHTML =
+    `<pre style="white-space:pre-wrap;font-size:13.5px;line-height:1.9;color:var(--text);font-family:'Noto Sans SC',sans-serif">${escaped}</pre>`;
+  document.getElementById('outputScore').style.display = 'grid';
+  document.getElementById('score-dims').textContent = entry.dims + '/6';
+  document.getElementById('score-complete').textContent = Math.round(entry.dims/6*100) + '%';
+  document.getElementById('score-words').textContent = entry.text.replace(/\s/g,'').length;
+  document.getElementById('builder').scrollIntoView({behavior:'smooth', block:'start'});
+  showToast('✓ 已载入历史提示词');
+}
+
+function historyCopyOne(e, id) {
+  const list = historyLoad();
+  const entry = list.find(en => en.id === id);
+  if (entry) copyT(e, entry.text);
+}
+
+function historyDelete(id) {
+  let list = historyLoad();
+  list = list.filter(e => e.id !== id);
+  historySave(list);
+  const el = document.getElementById('hi-' + id);
+  if (el) { el.style.opacity = '0'; el.style.height = '0'; el.style.overflow = 'hidden'; }
+  setTimeout(() => renderHistory(), 250);
+  showToast('已删除');
+}
+
+function clearHistory() {
+  if (!confirm('确定清空所有历史记录吗？此操作不可撤销。')) return;
+  historySave([]);
+  renderHistory();
+  showToast('已清空历史记录');
+}
+
+// ── INIT ──
+function initAll() {
+  try { renderCases('all'); } catch(e) { console.error('renderCases failed:', e); }
+  try { renderDocFiles(); } catch(e) { console.error('renderDocFiles failed:', e); }
+  try { renderSkills(); } catch(e) { console.error('renderSkills failed:', e); }
+  try { renderHistory(); } catch(e) { console.error('renderHistory failed:', e); }
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initAll);
+} else {
+  initAll();
+}
+</script>
+</body>
+</html>
+};

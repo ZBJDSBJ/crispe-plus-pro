@@ -1,0 +1,18 @@
+{
+  "version": 2,
+  "functions": {
+    "api/optimize.js": {
+      "runtime": "nodejs20.x"
+    }
+  },
+  "routes": [
+    {
+      "src": "/api/optimize",
+      "dest": "/api/optimize.js"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
+    }
+  ]
+}
