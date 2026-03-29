@@ -1,28 +1,32 @@
 /**
  * api/optimize.js — Vercel Serverless Function
- * 适用场景：小范围分享（<50人），站长承担费用，控制在免费额度内
  *
- * 防护策略（两层，都有效）：
- *   1. 访问密码   — 只有拿到密码的人才能调用，彻底挡住陌生人
- *   2. Vercel KV  — 真实持久化计数，每个密码每天限 N 次，跨实例生效
+ * 防护策略：
+ *   1. 访问密码   — 只有拿到密码的人才能调用
+ *   2. 限流计数   — 优先用 Upstash Redis；无 Redis 时用内存计数（重启重置，够用）
  *
- * Vercel 环境变量（在 Dashboard → Settings → Environment Variables 设置）：
+ * 必填环境变量（Vercel Dashboard → Settings → Environment Variables）：
  *   ANTHROPIC_API_KEY   必填  sk-ant-api03-xxxxx
- *   ACCESS_PASSWORD     必填  随便取一个密码，如 crispe2025
- *   KV_REST_API_URL     必填  来自 Vercel KV（见下方说明）
- *   KV_REST_API_TOKEN   必填  来自 Vercel KV
- *   DAILY_LIMIT         可选  每个密码每天最多调用几次，默认 20
+ *   ACCESS_PASSWORD     必填  自定义密码，如 crispe2025
  *
- * Vercel KV 创建方式（完全免费，每月 30万次 读写）：
- *   Vercel Dashboard → Storage → Create → KV Database → 选 Free 套餐
- *   创建后点击数据库 → Settings → 复制 KV_REST_API_URL 和 KV_REST_API_TOKEN
+ * 可选环境变量（填了就用 Upstash 持久化限流，不填走内存限流）：
+ *   KV_REST_API_URL     Upstash Redis REST URL
+ *   KV_REST_API_TOKEN   Upstash Redis REST Token
+ *   DAILY_LIMIT         每天全站最多调用次数，默认 20
  */
 
-// ── 常量 ─────────────────────────────────────────
-const DAILY_LIMIT  = parseInt(process.env.DAILY_LIMIT || '20', 10);
-const VALID_MODES  = ['crispe', 'enhance', 'variants', 'critique'];
+const DAILY_LIMIT = parseInt(process.env.DAILY_LIMIT || '20', 10);
+const VALID_MODES = ['crispe', 'enhance', 'variants', 'critique'];
 
-// ── Vercel KV 轻量封装（无需安装 SDK，直接用 REST API）──
+// ── 内存限流兜底（无 Redis 时使用）────────────────
+// Serverless 函数实例重启会重置，但对小流量站够用
+const memoryStore = new Map();
+
+function todayStr() {
+  return new Date().toISOString().slice(0, 10);
+}
+
+// ── Upstash / KV REST 封装 ────────────────────────
 async function kvGet(key) {
   const url   = process.env.KV_REST_API_URL;
   const token = process.env.KV_REST_API_TOKEN;
@@ -32,7 +36,7 @@ async function kvGet(key) {
       headers: { Authorization: `Bearer ${token}` },
     });
     const data = await res.json();
-    return data.result ?? null;          // null 表示 key 不存在
+    return data.result ?? null;
   } catch { return null; }
 }
 
@@ -41,40 +45,48 @@ async function kvSet(key, value, exSeconds) {
   const token = process.env.KV_REST_API_TOKEN;
   if (!url || !token) return;
   try {
-    await fetch(`${url}/set/${encodeURIComponent(key)}/${encodeURIComponent(value)}?ex=${exSeconds}`, {
-      method:  'GET',                    // Vercel KV REST 用 GET 设置值
-      headers: { Authorization: `Bearer ${token}` },
-    });
-  } catch { /* 忽略写入失败，不影响主流程 */ }
+    await fetch(
+      `${url}/set/${encodeURIComponent(key)}/${encodeURIComponent(value)}?ex=${exSeconds}`,
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+  } catch { /* 忽略，不影响主流程 */ }
 }
 
-// 获取今天的日期字符串作为 key 后缀，例如 "2025-03-02"
-function todayStr() {
-  return new Date().toISOString().slice(0, 10);
-}
-
-// ── 每日调用计数（基于 KV）──────────────────────
-// key 格式：opt:count:2025-03-02
-// 每天 0 点自动过期（TTL = 到明天 0 点的秒数）
+// ── 每日限流检查 ──────────────────────────────────
 async function checkDailyLimit() {
   const key     = `opt:count:${todayStr()}`;
-  const current = parseInt(await kvGet(key) || '0', 10);
+  const hasKV   = !!(process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN);
 
-  if (current >= DAILY_LIMIT) {
-    return { allowed: false, used: current, limit: DAILY_LIMIT };
+  let current = 0;
+
+  if (hasKV) {
+    // 用 Upstash 持久化计数
+    current = parseInt(await kvGet(key) || '0', 10);
+    if (current >= DAILY_LIMIT) {
+      return { allowed: false, used: current, limit: DAILY_LIMIT };
+    }
+    const now      = new Date();
+    const tomorrow = new Date(now);
+    tomorrow.setUTCHours(24, 0, 0, 0);
+    const ttlSec   = Math.ceil((tomorrow - now) / 1000);
+    await kvSet(key, String(current + 1), ttlSec);
+  } else {
+    // 内存计数兜底
+    current = memoryStore.get(key) || 0;
+    if (current >= DAILY_LIMIT) {
+      return { allowed: false, used: current, limit: DAILY_LIMIT };
+    }
+    memoryStore.set(key, current + 1);
+    // 每天清一次旧 key
+    for (const k of memoryStore.keys()) {
+      if (!k.endsWith(todayStr())) memoryStore.delete(k);
+    }
   }
 
-  // 计算到明天 0 点的剩余秒数
-  const now       = new Date();
-  const tomorrow  = new Date(now);
-  tomorrow.setUTCHours(24, 0, 0, 0);
-  const ttlSec    = Math.ceil((tomorrow - now) / 1000);
-
-  await kvSet(key, String(current + 1), ttlSec);
   return { allowed: true, used: current + 1, limit: DAILY_LIMIT };
 }
 
-// ── 系统提示词 ───────────────────────────────────
+// ── 系统提示词 ────────────────────────────────────
 const SYSTEM_BASE = `你是提示词工程专家，专注 CRISPE+ 框架：
 C（角色）/ R（背景）/ I（任务）/ S（风格）/ P（示例）/ E+（格式）
 输出规则：中文，不超过 500 字，不重复原始输入，直接给结论。`;
@@ -86,58 +98,49 @@ const MODE_INST = {
   critique: '找出 3-5 个具体弱点，每条格式：❌ 问题 → 原因 → ✅ 一句话修复建议。',
 };
 
-// ── 主处理函数 ───────────────────────────────────
+// ── 主处理函数 ────────────────────────────────────
 export default async function handler(req, res) {
 
-  // 1. 只接受 POST
   if (req.method !== 'POST') {
     return res.status(405).json({ error: '仅支持 POST 请求' });
   }
 
   const body = req.body || {};
 
-  // 2. 访问密码校验 ★ 核心防线 ★
-  //    前端在请求体中带上 password 字段
+  // 密码校验
   const correctPwd = process.env.ACCESS_PASSWORD;
-  if (correctPwd) {
-    if (!body.password || body.password !== correctPwd) {
-      return res.status(401).json({ error: '密码错误，请联系管理员获取访问密码' });
-    }
+  if (correctPwd && body.password !== correctPwd) {
+    return res.status(401).json({ error: '密码错误，请联系管理员获取访问密码' });
   }
 
-  // 3. Vercel KV 每日总量限制（全站共享配额）
+  // 每日限流
   const quota = await checkDailyLimit();
   res.setHeader('X-Daily-Used',  quota.used);
   res.setHeader('X-Daily-Limit', quota.limit);
 
   if (!quota.allowed) {
     return res.status(429).json({
-      error: `今日优化次数已达上限（${quota.limit} 次/天），明天再来吧 🙏`,
+      error:      `今日优化次数已达上限（${quota.limit} 次/天），明天再来 🙏`,
       dailyUsed:  quota.used,
       dailyLimit: quota.limit,
     });
   }
 
-  // 4. 参数校验
+  // 参数校验
   const { prompt, mode } = body;
   if (!prompt || typeof prompt !== 'string' || prompt.trim().length < 3) {
     return res.status(400).json({ error: '提示词不能少于 3 个字符' });
   }
-  const safeMode = VALID_MODES.includes(mode) ? mode : 'crispe';
+  const safeMode   = VALID_MODES.includes(mode) ? mode : 'crispe';
+  const cleanInput = prompt.slice(0, 600).replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '').trim();
 
-  // 5. 输入清洗（防注入 + 控 Token）
-  const cleanInput = prompt
-    .slice(0, 600)                                     // 最多 600 字
-    .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '') // 去控制字符
-    .trim();
-
-  // 6. 检查 API Key
+  // API Key 检查
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) {
     return res.status(500).json({ error: '服务端未配置 API Key，请联系管理员' });
   }
 
-  // 7. 调用 Claude Haiku（最便宜的模型）
+  // 调用 Claude Haiku
   try {
     const upstream = await fetch('https://api.anthropic.com/v1/messages', {
       method:  'POST',
@@ -147,8 +150,8 @@ export default async function handler(req, res) {
         'anthropic-version': '2023-06-01',
       },
       body: JSON.stringify({
-        model:      'claude-haiku-4-5-20251001', // Haiku：成本约为 Sonnet 的 1/20
-        max_tokens: 512,                          // 单次上限 512 token ≈ 400 中文字
+        model:      'claude-haiku-4-5-20251001',
+        max_tokens: 512,
         system:     `${SYSTEM_BASE}\n当前任务：${MODE_INST[safeMode]}`,
         messages:   [{ role: 'user', content: cleanInput }],
       }),
@@ -165,11 +168,7 @@ export default async function handler(req, res) {
       .map(b => b.text)
       .join('');
 
-    return res.status(200).json({
-      result,
-      dailyUsed:  quota.used,
-      dailyLimit: quota.limit,
-    });
+    return res.status(200).json({ result, dailyUsed: quota.used, dailyLimit: quota.limit });
 
   } catch (e) {
     console.error('[optimize]', e);
